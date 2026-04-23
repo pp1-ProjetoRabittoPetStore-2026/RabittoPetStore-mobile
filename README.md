@@ -29,24 +29,47 @@ RabittoPetStore é um aplicativo que permite tutores gerenciar o cuidado de seus
 ### Estrutura de Pastas
 
 ```
-app/
-├── _layout.tsx          # Configuração de rotas e layout
-├── index.tsx            # Tela inicial
-├── pages/               # Telas principais
-│   ├── home/
-│   ├── login/
-│   └── shared/          # Telas compartilhadas
-├── _components/         # Componentes reutilizáveis
-│   └── index.ts         # Barrel exports
-├── _hooks/              # Custom hooks
-│   └── index.ts
-├── types/               # TypeScript types
-│   └── type.d.ts
-├── utils/               # Funções utilitárias
-│   └── index.ts
-├── hooks/               # Hooks globais
-│   └── index.ts
-└── assets/              # Imagens e recursos estáticos
+├── CLAUDE.md
+├── README.md
+├── app
+│   ├── _layout.tsx
+│   └── index.tsx
+├── app.json
+├── assets
+│   └── images
+├── eslint.config.js
+├── package-lock.json
+├── package.json
+├── pages
+│   ├── home
+│   │   ├── _components
+│   │   │   └── index.ts
+│   │   └── _hooks
+│   │       └── index.ts
+│   └── login
+│       ├── _components
+│       │   └── index.ts
+│       └── _hooks
+│           └── index.ts
+├── services
+│   ├── api.ts
+│   └── modules
+│       └── user
+│           ├── api.ts
+│           └── queries.ts
+├── shared
+│   ├── components
+│   │   └── ui
+│   │       └── index.ts
+│   ├── hooks
+│   │   └── index.ts
+│   ├── services
+│   ├── types
+│   │   ├── type.d.ts
+│   │   └── user.d.ts
+│   └── utils
+│       └── index.ts
+└── tsconfig.json
 ```
 
 ---
