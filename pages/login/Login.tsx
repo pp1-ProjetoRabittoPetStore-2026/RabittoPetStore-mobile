@@ -1,4 +1,5 @@
 import { useLogin } from '@/services/modules/auth/queries';
+import { useAuth } from '@/shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Lock, LogIn, Mail } from 'lucide-react-native';
 import React from 'react';
@@ -15,6 +16,7 @@ import { LoginFormData, loginSchema } from './schema/login.schema';
 
 export default function LoginScreen() {
   const { mutate: login, isPending } = useLogin();
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -25,7 +27,11 @@ export default function LoginScreen() {
   });
 
   const onSubmit = (data: LoginFormData) => {
-    login(data); // Chama o hook do TanStack Query
+    login(data, {
+      onSuccess: async ({ token }) => {
+        await signIn(token);
+      },
+    });
   };
 
   return (

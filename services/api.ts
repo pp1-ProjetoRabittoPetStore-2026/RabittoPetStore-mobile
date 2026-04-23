@@ -1,3 +1,4 @@
+import { getStoredToken } from '@/services/modules/auth/storage';
 import axios from 'axios';
 
 export const api = axios.create({
@@ -8,8 +9,8 @@ export const api = axios.create({
 });
 
 // Exemplo: Interceptador para injetar token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+api.interceptors.request.use(async (config) => {
+  const token = await getStoredToken();
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
