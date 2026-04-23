@@ -1,5 +1,5 @@
+import { api } from '@/services/api';
 import { Tutor } from '@/shared/types/user';
-import { api } from '../../api';
 
 export async function getTutores(): Promise<Tutor[]> {
   const { data } = await api.get<Tutor[]>('/tutores');
