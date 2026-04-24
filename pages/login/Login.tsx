@@ -30,8 +30,8 @@ export default function LoginScreen() {
 
   const onSubmit = (data: LoginFormData) => {
     login(data, {
-      onSuccess: async ({ token }) => {
-        await signIn(token);
+      onSuccess: async ({ accessToken }) => {
+        await signIn(accessToken);
       },
     });
   };

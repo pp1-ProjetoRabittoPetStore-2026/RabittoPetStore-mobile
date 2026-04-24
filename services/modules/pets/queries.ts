@@ -13,6 +13,16 @@ export function useCreatePet() {
   });
 }
 
+export function usePetById(id: string) {
+  return useQuery({
+    queryKey: ['pet', id],
+    queryFn: async () => {
+      const response = await api.get(`/pets/${id}`);
+      return response.data as Pet;
+    },
+  });
+}
+
 export function useUpdatePet() {
   const queryClient = useQueryClient();
 
@@ -48,9 +58,9 @@ export function useGetPets() {
 
 export function useGetMyPets() {
   return useQuery({
-    queryKey: ['pets', 'me'],
+    queryKey: ['pets'],
     queryFn: async () => {
-      const response = await api.get('/pets/me');
+      const response = await api.get('/pets');
       return response.data as Pet[];
     },
   });

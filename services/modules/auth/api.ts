@@ -1,8 +1,8 @@
 import { api } from '@/services/api';
-import { Login } from '@/shared/types/auth';
+import { Login, LoginResponse } from '@/shared/types/auth';
 
-export async function login(credentials: Login): Promise<{ token: string }> {
-  const { data } = await api.post<{ token: string }>(
+export async function login(credentials: Login): Promise<LoginResponse> {
+  const { data } = await api.post<LoginResponse>(
     '/auth/login',
     credentials,
   );

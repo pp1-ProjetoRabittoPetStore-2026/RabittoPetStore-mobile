@@ -1,5 +1,6 @@
 import { useGetMyPets } from '@/services/modules/pets/queries';
 import { Pet } from '@/shared/types/pet';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -11,18 +12,25 @@ import {
 } from 'react-native';
 
 function PetCard({ pet }: { pet: Pet }) {
+  const router = useRouter();
+
   return (
     <View style={styles.card}>
-      <Text style={styles.petName}>{pet.nome}</Text>
-      <Text style={styles.petMeta}>Raça: {pet.raca || 'Não informada'}</Text>
-      <Text style={styles.petMeta}>Porte: {pet.porte || 'Não informado'}</Text>
+      <TouchableOpacity onPress={() => router.push('/pets-details')}>
+        <Text style={styles.petName}>{pet.nome}</Text>
+        <Text style={styles.petMeta}>Raça: {pet.raca || 'Não informada'}</Text>
+        <Text style={styles.petMeta}>Porte: {pet.porte || 'Não informado'}</Text>
+      </TouchableOpacity>
+
     </View>
   );
 }
 
 function Home() {
+  const router = useRouter();
+
   const {
-    data: pets = [],
+    data: pets,
     isLoading,
     isError,
     refetch,
@@ -55,11 +63,14 @@ function Home() {
     <View style={styles.container}>
       <Text style={styles.title}>Meus Pets</Text>
 
-      {pets.length === 0 ? (
+      {pets?.length === 0 ? (
         <View style={styles.centeredState}>
           <Text style={styles.stateTitle}>Voce ainda nao cadastrou pets</Text>
           <Text style={styles.stateText}>
             Cadastre um pet para comecar a usar o app.
+            <TouchableOpacity style={styles.registerPetButton} onPress={() => router.push('/register-pet')}>
+              <Text style={styles.registerPetButtonText}>Cadastrar pet</Text>
+            </TouchableOpacity>
           </Text>
         </View>
       ) : (
@@ -72,6 +83,11 @@ function Home() {
           contentContainerStyle={styles.listContent}
           refreshing={isRefetching}
           onRefresh={refetch}
+          ListFooterComponent={
+            <TouchableOpacity style={styles.registerPetButton} onPress={() => router.push('/register-pet')}>
+              <Text style={styles.registerPetButtonText}>Cadastrar pet</Text>
+            </TouchableOpacity>
+          }
         />
       )}
     </View>
@@ -140,6 +156,18 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   retryButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  registerPetButton: {
+    marginTop: 12,
+    backgroundColor: '#0f766e',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  registerPetButtonText: {
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',

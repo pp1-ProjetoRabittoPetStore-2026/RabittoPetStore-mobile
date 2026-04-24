@@ -31,7 +31,7 @@ export default function RegisterPet() {
     formState: { errors },
   } = useForm<PetFormInput, any, PetFormData>({
     resolver: zodResolver(petSchema),
-    defaultValues: { nome: '', especie: '', raca: '', idade: '' },
+    defaultValues: { nome: '', especie: '', raca: '', idade: '', porte: 'médio' },
   });
 
   const onSubmit = (data: PetFormData) => {
@@ -122,6 +122,29 @@ export default function RegisterPet() {
           </View>
           {errors.raca && (
             <Text style={styles.errorText}>{errors.raca.message}</Text>
+          )}
+        </View>
+
+        {/* Porte */}
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Porte</Text>
+          <View style={styles.inputContainer}>
+            <Dog color="#666" size={20} style={styles.icon} />
+            <Controller
+              control={control}
+              name="porte"
+              render={({ field: { onChange, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Ex: Golden Retriever"
+                  onChangeText={onChange}
+                  value={value}
+                />
+              )}
+            />
+          </View>
+          {errors.porte && (
+            <Text style={styles.errorText}>{errors.porte.message}</Text>
           )}
         </View>
 
