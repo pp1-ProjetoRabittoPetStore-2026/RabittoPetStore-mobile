@@ -19,9 +19,10 @@ function PetCard({ pet }: { pet: Pet }) {
       <TouchableOpacity onPress={() => router.push(`/pets-details/${pet.id}`)}>
         <Text style={styles.petName}>{pet.nome}</Text>
         <Text style={styles.petMeta}>Raça: {pet.raca || 'Não informada'}</Text>
-        <Text style={styles.petMeta}>Porte: {pet.porte || 'Não informado'}</Text>
+        <Text style={styles.petMeta}>
+          Porte: {pet.porte || 'Não informado'}
+        </Text>
       </TouchableOpacity>
-
     </View>
   );
 }
@@ -37,7 +38,7 @@ function Home() {
     isRefetching,
   } = useGetMyPets();
 
-  if (isLoading) {
+  if (isLoading || isRefetching) {
     return (
       <View style={styles.centeredState}>
         <ActivityIndicator size="large" color="#0f766e" />
@@ -50,7 +51,7 @@ function Home() {
     return (
       <View style={styles.centeredState}>
         <Text style={styles.stateTitle}>
-          Nao foi possivel carregar seus pets
+          Não foi possivel carregar seus pets
         </Text>
         <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
           <Text style={styles.retryButtonText}>Tentar novamente</Text>
@@ -68,7 +69,10 @@ function Home() {
           <Text style={styles.stateTitle}>Voce ainda nao cadastrou pets</Text>
           <Text style={styles.stateText}>
             Cadastre um pet para comecar a usar o app.
-            <TouchableOpacity style={styles.registerPetButton} onPress={() => router.push('/register-pet')}>
+            <TouchableOpacity
+              style={styles.registerPetButton}
+              onPress={() => router.push('/register-pet')}
+            >
               <Text style={styles.registerPetButtonText}>Cadastrar pet</Text>
             </TouchableOpacity>
           </Text>
@@ -84,7 +88,10 @@ function Home() {
           refreshing={isRefetching}
           onRefresh={refetch}
           ListFooterComponent={
-            <TouchableOpacity style={styles.registerPetButton} onPress={() => router.push('/register-pet')}>
+            <TouchableOpacity
+              style={styles.registerPetButton}
+              onPress={() => router.push('/register-pet')}
+            >
               <Text style={styles.registerPetButtonText}>Cadastrar pet</Text>
             </TouchableOpacity>
           }
