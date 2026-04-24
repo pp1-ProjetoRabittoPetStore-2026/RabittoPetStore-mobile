@@ -23,8 +23,10 @@ import {
     Dog,
     Cat,
     Calendar,
-    Info
+    Info,
+    CalendarPlus,
 } from 'lucide-react-native';
+import { AgendarModal } from './_components/AgendarModal';
 
 import { useDeletePet, usePetById, useUpdatePet } from '@/services/modules/pets/queries';
 import { petSchema, PetFormData } from './schema/pet.schema';
@@ -35,6 +37,7 @@ export default function PetDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
+    const [isAgendarVisible, setIsAgendarVisible] = useState(false);
 
     // Queries e Mutations
     const { data: pet, isLoading } = usePetById(id);
@@ -170,7 +173,7 @@ export default function PetDetails() {
                     />
                 </View>
 
-                {isEditing && (
+                {isEditing ? (
                     <TouchableOpacity
                         style={styles.saveButton}
                         onPress={handleSubmit(onUpdate)}
@@ -185,6 +188,23 @@ export default function PetDetails() {
                             </>
                         )}
                     </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={styles.agendarButton}
+                        onPress={() => setIsAgendarVisible(true)}
+                    >
+                        <CalendarPlus size={22} color="#FFF" />
+                        <Text style={styles.agendarButtonText}>Agendar Serviço</Text>
+                    </TouchableOpacity>
+                )}
+
+                {pet?.id != null && (
+                    <AgendarModal
+                        visible={isAgendarVisible}
+                        onClose={() => setIsAgendarVisible(false)}
+                        petId={pet.id}
+                        petNome={pet.nome}
+                    />
                 )}
             </ScrollView>
         </KeyboardAvoidingView>
@@ -270,5 +290,16 @@ const styles = StyleSheet.create({
         marginTop: 30,
     },
     saveButtonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+    agendarButton: {
+        backgroundColor: '#FF6B6B',
+        height: 55,
+        borderRadius: 12,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10,
+        marginTop: 24,
+    },
+    agendarButtonText: { color: '#FFF', fontSize: 17, fontWeight: 'bold' },
     errorText: { color: '#E74C3C', fontSize: 12, marginTop: 5 },
 });
