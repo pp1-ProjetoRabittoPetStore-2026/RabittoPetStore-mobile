@@ -16,7 +16,7 @@ function PetCard({ pet }: { pet: Pet }) {
 
   return (
     <View style={styles.card}>
-      <TouchableOpacity onPress={() => router.push('/pets-details')}>
+      <TouchableOpacity onPress={() => router.push(`/pets-details/${pet.id}`)}>
         <Text style={styles.petName}>{pet.nome}</Text>
         <Text style={styles.petMeta}>Raça: {pet.raca || 'Não informada'}</Text>
         <Text style={styles.petMeta}>Porte: {pet.porte || 'Não informado'}</Text>

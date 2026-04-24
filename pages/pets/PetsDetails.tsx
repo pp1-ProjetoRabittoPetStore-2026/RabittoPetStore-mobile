@@ -27,8 +27,6 @@ import {
 } from 'lucide-react-native';
 
 import { useDeletePet, usePetById, useUpdatePet } from '@/services/modules/pets/queries';
-
-// Hooks e Schemas (Ajuste os imports conforme sua estrutura)
 import { petSchema, PetFormData } from './schema/pet.schema';
 
 type PetFormInput = z.input<typeof petSchema>;
@@ -193,7 +191,6 @@ export default function PetDetails() {
     );
 }
 
-// Sub-componente para organizar os campos
 function Field({ label, name, control, isEditing, value, error, icon, ...rest }: any) {
     return (
         <View style={styles.fieldWrapper}>
