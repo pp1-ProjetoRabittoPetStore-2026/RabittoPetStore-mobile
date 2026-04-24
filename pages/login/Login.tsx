@@ -1,6 +1,7 @@
 import { useLogin } from '@/services/modules/auth/queries';
 import { useAuth } from '@/shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
 import { Lock, LogIn, Mail } from 'lucide-react-native';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -15,6 +16,7 @@ import {
 import { LoginFormData, loginSchema } from './schema/login.schema';
 
 export default function LoginScreen() {
+  const router = useRouter();
   const { mutate: login, isPending } = useLogin();
   const { signIn } = useAuth();
 
@@ -96,6 +98,9 @@ export default function LoginScreen() {
             <LogIn color="#FFF" size={20} />
           </>
         )}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push('/register')}>
+        <Text style={styles.buttonText}>Registre-se</Text>
       </TouchableOpacity>
     </View>
   );

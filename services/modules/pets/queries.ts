@@ -45,3 +45,13 @@ export function useGetPets() {
     },
   });
 }
+
+export function useGetMyPets() {
+  return useQuery({
+    queryKey: ['pets', 'me'],
+    queryFn: async () => {
+      const response = await api.get('/pets/me');
+      return response.data as Pet[];
+    },
+  });
+}

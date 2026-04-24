@@ -1,5 +1,6 @@
 import { useCreateTutor } from '@/services/modules/user/queries';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
   Lock,
@@ -23,7 +24,8 @@ import {
 } from 'react-native';
 import { RegisterFormData, registerSchema } from './schema/register.schema';
 
-export default function RegisterScreen({ navigation }: any) {
+export default function RegisterScreen() {
+  const router = useRouter();
   const { mutate: register, isPending } = useCreateTutor();
 
   const {
@@ -47,7 +49,7 @@ export default function RegisterScreen({ navigation }: any) {
         {/* Botão Voltar */}
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
         >
           <ArrowLeft color="#333" size={24} />
         </TouchableOpacity>
@@ -218,7 +220,7 @@ const styles = StyleSheet.create({
   icon: { marginRight: 10 },
   input: { flex: 1, height: 50, fontSize: 16 },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#FF6B6B',
     height: 55,
     borderRadius: 12,
     flexDirection: 'row',
