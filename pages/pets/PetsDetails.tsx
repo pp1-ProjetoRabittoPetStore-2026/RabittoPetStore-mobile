@@ -25,10 +25,14 @@ import {
     Calendar,
     Info,
     CalendarPlus,
+    ClipboardList,
+    Scissors,
+    Clock,
 } from 'lucide-react-native';
 import { AgendarModal } from './_components/AgendarModal';
 
 import { useDeletePet, usePetById, useUpdatePet } from '@/services/modules/pets/queries';
+import { useAgendamentosByPet } from '@/services/modules/agendamento/queries';
 import { petSchema, PetFormData } from './schema/pet.schema';
 
 type PetFormInput = z.input<typeof petSchema>;
@@ -43,6 +47,7 @@ export default function PetDetails() {
     const { data: pet, isLoading } = usePetById(id);
     const { mutate: updatePet, isPending: isUpdating } = useUpdatePet();
     const { mutate: deletePet } = useDeletePet();
+    const { data: agendamentos, isLoading: loadingAgendamentos } = useAgendamentosByPet(pet?.id);
 
     const {
         control,
@@ -206,6 +211,56 @@ export default function PetDetails() {
                         petNome={pet.nome}
                     />
                 )}
+
+                {/* ── Serviços Agendados ── */}
+                {!isEditing && (
+                    <>
+                        <View style={styles.scheduledHeader}>
+                            <ClipboardList size={20} color="#555" />
+                            <Text style={styles.scheduledTitle}>Serviços Agendados</Text>
+                        </View>
+
+                        {loadingAgendamentos ? (
+                            <ActivityIndicator color="#FF6B6B" style={{ marginVertical: 12 }} />
+                        ) : !agendamentos || agendamentos.length === 0 ? (
+                            <View style={styles.emptyScheduled}>
+                                <Calendar size={30} color="#DDD" />
+                                <Text style={styles.emptyScheduledText}>Nenhum agendamento encontrado.</Text>
+                            </View>
+                        ) : (
+                            agendamentos.map((a) => {
+                                const dt = new Date(a.dataHora);
+                                const dateStr = dt.toLocaleDateString('pt-BR', {
+                                    day: '2-digit', month: '2-digit', year: 'numeric',
+                                });
+                                const timeStr = dt.toLocaleTimeString('pt-BR', {
+                                    hour: '2-digit', minute: '2-digit',
+                                });
+                                return (
+                                    <View key={a.id} style={styles.agendamentoCard}>
+                                        <View style={styles.agendamentoIconBox}>
+                                            <Scissors size={18} color="#FF6B6B" />
+                                        </View>
+                                        <View style={styles.agendamentoInfo}>
+                                            <Text style={styles.agendamentoServico}>{a.servico.nome}</Text>
+                                            <View style={styles.agendamentoMeta}>
+                                                <Calendar size={13} color="#AAA" />
+                                                <Text style={styles.agendamentoMetaText}>{dateStr}</Text>
+                                                <Clock size={13} color="#AAA" />
+                                                <Text style={styles.agendamentoMetaText}>{timeStr}</Text>
+                                            </View>
+                                        </View>
+                                        {a.servico.preco != null && (
+                                            <Text style={styles.agendamentoPreco}>
+                                                R$ {a.servico.preco.toFixed(2)}
+                                            </Text>
+                                        )}
+                                    </View>
+                                );
+                            })
+                        )}
+                    </>
+                )}
             </ScrollView>
         </KeyboardAvoidingView>
     );
@@ -302,4 +357,46 @@ const styles = StyleSheet.create({
     },
     agendarButtonText: { color: '#FFF', fontSize: 17, fontWeight: 'bold' },
     errorText: { color: '#E74C3C', fontSize: 12, marginTop: 5 },
+
+    // Scheduled services section
+    scheduledHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 32,
+        marginBottom: 14,
+    },
+    scheduledTitle: { fontSize: 17, fontWeight: '700', color: '#333' },
+    emptyScheduled: {
+        alignItems: 'center',
+        paddingVertical: 24,
+        gap: 10,
+    },
+    emptyScheduledText: { fontSize: 14, color: '#BBBBBB' },
+    agendamentoCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        borderRadius: 16,
+        padding: 14,
+        marginBottom: 10,
+        shadowColor: '#000',
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
+        elevation: 1,
+        gap: 12,
+    },
+    agendamentoIconBox: {
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: '#FFF0F0',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    agendamentoInfo: { flex: 1 },
+    agendamentoServico: { fontSize: 15, fontWeight: '600', color: '#333', marginBottom: 4 },
+    agendamentoMeta: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+    agendamentoMetaText: { fontSize: 12, color: '#AAA' },
+    agendamentoPreco: { fontSize: 14, fontWeight: '700', color: '#FF6B6B' },
 });

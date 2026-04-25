@@ -1,6 +1,7 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgendamentoPayload } from '@/shared/types/agendamento';
-import { createAgendamento, getHorariosDisponiveis, getServicos } from './api';
+import { createAgendamento, getAgendamentos, getHorariosDisponiveis, getServicos } from './api';
+
 
 export function useServicos() {
   return useQuery({
@@ -17,9 +18,25 @@ export function useHorariosDisponiveis(data: string, servicoId: number | null) {
   });
 }
 
+export function useAgendamentosByPet(petId: number | undefined) {
+  return useQuery({
+    queryKey: ['agendamentos', petId],
+    queryFn: async () => {
+      const all = await getAgendamentos();
+      return all.filter((a) => a.pet.id === petId);
+    },
+    enabled: petId != null,
+  });
+}
+
 export function useCreateAgendamento() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (payload: AgendamentoPayload) => createAgendamento(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agendamentos'] });
+    },
   });
 }
 

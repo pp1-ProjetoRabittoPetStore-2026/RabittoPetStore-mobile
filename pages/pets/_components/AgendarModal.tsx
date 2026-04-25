@@ -14,6 +14,7 @@ import { X, Calendar, Clock, Scissors } from 'lucide-react-native';
 
 import { useServicos, useHorariosDisponiveis, useCreateAgendamento } from '@/services/modules/agendamento/queries';
 import { Servico } from '@/shared/types/agendamento';
+import { useRouter } from 'expo-router';
 
 interface AgendarModalProps {
     visible: boolean;
@@ -29,11 +30,13 @@ const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(toda
 const isValidDate = (val: string) => /^\d{4}-\d{2}-\d{2}$/.test(val);
 
 export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalProps) {
+    const router = useRouter();
     const [date, setDate] = useState(todayStr);
     const [selectedServico, setSelectedServico] = useState<Servico | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
     const { data: servicos, isLoading: loadingServicos } = useServicos();
+
 
     const {
         data: horariosDisponiveis,
@@ -82,6 +85,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                     Alert.alert('Sucesso! 🐾', `Agendamento de ${petNome} confirmado para ${date} às ${selectedTime}!`);
                     setSelectedTime(null);
                     onClose();
+                    router.push(`/pets-details/${petId}`)
                 },
                 onError: (error: any) => {
                     const msg =

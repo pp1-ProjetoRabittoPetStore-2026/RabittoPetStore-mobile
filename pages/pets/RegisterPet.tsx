@@ -136,7 +136,7 @@ export default function RegisterPet() {
               render={({ field: { onChange, value } }) => (
                 <TextInput
                   style={styles.input}
-                  placeholder="Ex: Golden Retriever"
+                  placeholder="Ex: pequeno, médio, grande"
                   onChangeText={onChange}
                   value={value}
                 />

@@ -16,6 +16,11 @@ export const getHorariosDisponiveis = async (
   return response.data;
 };
 
+export const getAgendamentos = async (): Promise<Agendamento[]> => {
+  const response = await api.get('/agendamentos');
+  return response.data;
+};
+
 export const createAgendamento = async (payload: AgendamentoPayload): Promise<Agendamento> => {
   const response = await api.post('/agendamentos', payload);
   return response.data;
