@@ -1,5 +1,9 @@
 import { api } from '@/services/api';
-import { Agendamento, AgendamentoPayload, Servico } from '@/shared/types/agendamento';
+import {
+  Agendamento,
+  AgendamentoPayload,
+  Servico,
+} from '@/shared/types/agendamento';
 
 export const getServicos = async (): Promise<Servico[]> => {
   const response = await api.get('/servicos');
@@ -8,7 +12,7 @@ export const getServicos = async (): Promise<Servico[]> => {
 
 export const getHorariosDisponiveis = async (
   data: string,
-  servicoId: number
+  servicoId: number,
 ): Promise<string[]> => {
   const response = await api.get('/agendamentos/horarios-disponiveis', {
     params: { data, servicoId },
@@ -17,11 +21,13 @@ export const getHorariosDisponiveis = async (
 };
 
 export const getAgendamentos = async (): Promise<Agendamento[]> => {
-  const response = await api.get('/agendamentos');
+  const response = await api.get('/agendamentos/status');
   return response.data;
 };
 
-export const createAgendamento = async (payload: AgendamentoPayload): Promise<Agendamento> => {
+export const createAgendamento = async (
+  payload: AgendamentoPayload,
+): Promise<Agendamento> => {
   const response = await api.post('/agendamentos', payload);
   return response.data;
 };
