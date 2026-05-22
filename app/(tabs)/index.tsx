@@ -1,15 +1,27 @@
 import Home from '@/pages/home/Home';
 import { useLogout } from '@/services/modules/auth/queries';
 import { useAuth } from '@/shared/hooks';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
+import { LogOut } from 'lucide-react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Index() {
   const { signOut } = useAuth();
   const { mutate: logout, isPending } = useLogout();
+  const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
 
   function handleLogout() {
     logout(undefined, {
       onSettled: async () => {
+        queryClient.clear();
         await signOut();
       },
     });
@@ -17,21 +29,21 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Home />
-      <View style={styles.logoutWrapper}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
+        <Text style={styles.headerTitle}>Meus Pets</Text>
         <TouchableOpacity
           onPress={handleLogout}
           disabled={isPending}
-          style={[
-            styles.logoutButton,
-            isPending && styles.logoutButtonDisabled,
-          ]}
+          style={styles.logoutButton}
         >
-          <Text style={styles.logoutText}>
-            {isPending ? 'Saindo...' : 'Sair'}
-          </Text>
+          {isPending ? (
+            <ActivityIndicator size="small" color="#000" />
+          ) : (
+            <LogOut color="#000" size={22} />
+          )}
         </TouchableOpacity>
       </View>
+      <Home />
     </View>
   );
 }
@@ -41,22 +53,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
-  logoutWrapper: {
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingBottom: 20,
+    paddingBottom: 12,
+    backgroundColor: '#f8fafc',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0f172a',
   },
   logoutButton: {
-    backgroundColor: '#ef4444',
-    borderRadius: 10,
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  logoutButtonDisabled: {
-    opacity: 0.7,
-  },
-  logoutText: {
-    color: '#fff',
-    fontWeight: '600',
+    padding: 6,
   },
 });

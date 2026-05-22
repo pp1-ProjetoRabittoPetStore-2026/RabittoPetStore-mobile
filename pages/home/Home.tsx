@@ -1,10 +1,13 @@
 import { useGetMyPets } from '@/services/modules/pets/queries';
 import { Pet } from '@/shared/types/pet';
 import { useRouter } from 'expo-router';
+import { ChevronRight, PawPrint, Pencil } from 'lucide-react-native';
 import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,15 +18,28 @@ function PetCard({ pet }: { pet: Pet }) {
   const router = useRouter();
 
   return (
-    <View style={styles.card}>
-      <TouchableOpacity onPress={() => router.push(`/pets-details/${pet.id}`)}>
-        <Text style={styles.petName}>{pet.nome}</Text>
-        <Text style={styles.petMeta}>Raça: {pet.raca || 'Não informada'}</Text>
-        <Text style={styles.petMeta}>
-          Porte: {pet.porte || 'Não informado'}
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(`/pets-details/${pet.id}`)}
+      activeOpacity={0.7}
+    >
+      <View style={styles.cardLeft}>
+        <View style={styles.petAvatar}>
+          <PawPrint color="#0f766e" size={22} />
+        </View>
+        <View>
+          <Text style={styles.petName}>{pet.nome}</Text>
+          <Text style={styles.petMeta}>
+            {pet.raca || 'Raça não informada'} ·{' '}
+            {pet.porte || 'Porte não informado'}
+          </Text>
+        </View>
+      </View>
+      <View style={styles.cardRight}>
+        <Pencil color="#94a3b8" size={14} />
+        <ChevronRight color="#94a3b8" size={20} />
+      </View>
+    </TouchableOpacity>
   );
 }
 
@@ -62,21 +78,26 @@ function Home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Meus Pets</Text>
-
       {pets?.length === 0 ? (
-        <View style={styles.centeredState}>
-          <Text style={styles.stateTitle}>Voce ainda nao cadastrou pets</Text>
+        <ScrollView
+          contentContainerStyle={styles.centeredState}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          }
+        >
+          <Text style={styles.stateTitle}>Você ainda nao cadastrou pets</Text>
           <Text style={styles.stateText}>
             Cadastre um pet para comecar a usar o app.
-            <TouchableOpacity
-              style={styles.registerPetButton}
-              onPress={() => router.push('/register-pet')}
-            >
-              <Text style={styles.registerPetButtonText}>Cadastrar pet</Text>
-            </TouchableOpacity>
           </Text>
-        </View>
+          <TouchableOpacity
+            style={styles.registerPetButton}
+            onPress={() => router.push('/register-pet')}
+          >
+            <Text style={styles.registerPetButtonText}>
+              <PawPrint color="#FFF" size={12} /> Cadastrar pet
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
       ) : (
         <FlatList
           data={pets}
@@ -92,7 +113,9 @@ function Home() {
               style={styles.registerPetButton}
               onPress={() => router.push('/register-pet')}
             >
-              <Text style={styles.registerPetButtonText}>Cadastrar pet</Text>
+              <Text style={styles.registerPetButtonText}>
+                <PawPrint color="#FFF" size={12} /> Cadastrar pet
+              </Text>
             </TouchableOpacity>
           }
         />
@@ -125,16 +148,38 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2e8f0',
     padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  cardRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  petAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#f0fdf4',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   petName: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '700',
     color: '#0f172a',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   petMeta: {
-    fontSize: 14,
-    color: '#475569',
+    fontSize: 13,
+    color: '#64748b',
   },
   centeredState: {
     flex: 1,
@@ -157,7 +202,7 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: 12,
-    backgroundColor: '#0f766e',
+    backgroundColor: '#FF6B6B',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -169,7 +214,7 @@ const styles = StyleSheet.create({
   },
   registerPetButton: {
     marginTop: 12,
-    backgroundColor: '#0f766e',
+    backgroundColor: '#FF6B6B',
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -178,6 +223,8 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

@@ -2,8 +2,8 @@ import { useLogin } from '@/services/modules/auth/queries';
 import { useAuth } from '@/shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
-import { Lock, LogIn, Mail } from 'lucide-react-native';
-import React from 'react';
+import { Eye, EyeOff, Lock, LogIn, Mail } from 'lucide-react-native';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
@@ -19,6 +19,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const { mutate: login, isPending } = useLogin();
   const { signIn } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     control,
@@ -76,10 +77,17 @@ export default function LoginScreen() {
               onBlur={onBlur}
               onChangeText={onChange}
               value={value}
-              secureTextEntry
+              secureTextEntry={!showPassword}
             />
           )}
         />
+        <TouchableOpacity onPress={() => setShowPassword((v) => !v)}>
+          {showPassword ? (
+            <EyeOff color="#666" size={20} />
+          ) : (
+            <Eye color="#666" size={20} />
+          )}
+        </TouchableOpacity>
       </View>
       {errors.senha && (
         <Text style={styles.errorText}>{errors.senha.message}</Text>
@@ -100,7 +108,7 @@ export default function LoginScreen() {
         )}
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push('/register')}>
-        <Text style={styles.buttonText}>Registre-se</Text>
+        <Text style={styles.buttonRegister}>Registre-se</Text>
       </TouchableOpacity>
     </View>
   );
@@ -143,6 +151,13 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { opacity: 0.7 },
   buttonText: { color: '#FFF', fontSize: 18, fontWeight: 'bold' },
+  buttonRegister: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '200',
+    marginTop: 15,
+    textAlign: 'right',
+  },
   errorText: {
     color: '#E74C3C',
     fontSize: 12,

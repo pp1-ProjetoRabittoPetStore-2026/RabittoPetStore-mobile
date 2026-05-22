@@ -11,7 +11,17 @@ export const getPets = async (): Promise<Pet[]> => {
   }
 };
 
-export const addPet = async (pet: Pet): Promise<void> => {
+export const getMyPets = async (): Promise<Pet[]> => {
+  try {
+    const response = await api.get('/pets/me');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching my pets:', error);
+    throw error;
+  }
+};
+
+export const addPet = async (pet: Omit<Pet, 'tutorId'>): Promise<void> => {
   try {
     await api.post('/pets', pet);
   } catch (error) {

@@ -78,6 +78,9 @@ export default function PetDetails() {
                     Alert.alert('Sucesso', 'Dados atualizados!');
                     setIsEditing(false);
                 },
+                onError: () => {
+                    Alert.alert('Erro', 'Não foi possível atualizar os dados. Tente novamente.');
+                },
             }
         );
     };
@@ -92,6 +95,9 @@ export default function PetDetails() {
                     deletePet(id, {
                         onSuccess: () => {
                             router.replace('/(tabs)');
+                        },
+                        onError: () => {
+                            Alert.alert('Erro', 'Não foi possível excluir o pet. Tente novamente.');
                         },
                     });
                 },

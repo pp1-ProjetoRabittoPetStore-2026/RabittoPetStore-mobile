@@ -3,16 +3,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import {
   ArrowLeft,
+  Eye,
+  EyeOff,
   Lock,
   Mail,
   Phone,
   User,
   UserPlus,
 } from 'lucide-react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -27,6 +30,7 @@ import { RegisterFormData, registerSchema } from './schema/register.schema';
 export default function RegisterScreen() {
   const router = useRouter();
   const { mutate: register, isPending } = useCreateTutor();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     control,
@@ -37,7 +41,16 @@ export default function RegisterScreen() {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    register(data);
+    register(data, {
+      onSuccess: () => {
+        Alert.alert('Conta criada!', 'Seu cadastro foi realizado com sucesso.', [
+          { text: 'OK', onPress: () => router.back() },
+        ]);
+      },
+      onError: () => {
+        Alert.alert('Erro ao cadastrar', 'Não foi possível criar sua conta. Tente novamente.');
+      },
+    });
   };
 
   return (
@@ -160,10 +173,17 @@ export default function RegisterScreen() {
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                 />
               )}
             />
+            <TouchableOpacity onPress={() => setShowPassword((v) => !v)}>
+              {showPassword ? (
+                <EyeOff color="#666" size={20} />
+              ) : (
+                <Eye color="#666" size={20} />
+              )}
+            </TouchableOpacity>
           </View>
           {errors.senha && (
             <Text style={styles.errorText}>{errors.senha.message}</Text>

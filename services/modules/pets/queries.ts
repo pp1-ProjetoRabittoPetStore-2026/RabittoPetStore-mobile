@@ -8,7 +8,7 @@ export function useCreatePet() {
   return useMutation({
     mutationFn: (newPet: Pet) => api.post('/pets', newPet),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets'] });
+      queryClient.invalidateQueries({ queryKey: ['my-pets'] });
     },
   });
 }
@@ -30,7 +30,7 @@ export function useUpdatePet() {
     mutationFn: ({ id, updatedPet }: { id: string; updatedPet: Pet }) =>
       api.put(`/pets/${id}`, updatedPet),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets'] });
+      queryClient.invalidateQueries({ queryKey: ['my-pets'] });
     },
   });
 }
@@ -41,26 +41,16 @@ export function useDeletePet() {
   return useMutation({
     mutationFn: (id: string) => api.delete(`/pets/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets'] });
-    },
-  });
-}
-
-export function useGetPets() {
-  return useQuery({
-    queryKey: ['pets'],
-    queryFn: async () => {
-      const response = await api.get('/pets');
-      return response.data as Pet[];
+      queryClient.invalidateQueries({ queryKey: ['my-pets'] });
     },
   });
 }
 
 export function useGetMyPets() {
   return useQuery({
-    queryKey: ['pets'],
+    queryKey: ['my-pets'],
     queryFn: async () => {
-      const response = await api.get('/pets');
+      const response = await api.get('/pets/me');
       return response.data as Pet[];
     },
   });

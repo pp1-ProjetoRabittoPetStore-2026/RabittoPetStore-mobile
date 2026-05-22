@@ -21,11 +21,14 @@ Guide for effective collaboration with Claude AI on the **RabittoPetStore-mobile
 
 **Tech Stack:**
 
-- React Native + TypeScript
-- State: Zustand + React Query
-- Forms: React Hook Form + Zod validation
+- Expo 54 + React Native 0.81 + TypeScript
+- Navigation: Expo Router v6
+- State: Zustand v5 + React Query v5 (TanStack)
+- Forms: React Hook Form v7 + Zod v4
 - HTTP: Axios
 - UI: Lucide React Native icons
+- Auth storage: expo-secure-store
+- Dates: date-fns v4
 
 **Key Principles:**
 
@@ -37,47 +40,30 @@ Guide for effective collaboration with Claude AI on the **RabittoPetStore-mobile
 **Project Structure:**
 
 ```
-├── CLAUDE.md
-├── README.md
-├── app
+├── app/
 │   ├── _layout.tsx
-│   └── index.tsx
-├── app.json
-├── assets
-│   └── images
-├── eslint.config.js
-├── package-lock.json
-├── package.json
-├── pages
-│   ├── home
-│   │   ├── _components
-│   │   │   └── index.ts
-│   │   └── _hooks
-│   │       └── index.ts
-│   └── login
-│       ├── _components
-│       │   └── index.ts
-│       └── _hooks
-│           └── index.ts
-├── services
-│   ├── api.ts
-│   └── modules
-│       └── user
-│           ├── api.ts
-│           └── queries.ts
-├── shared
-│   ├── components
-│   │   └── ui
-│   │       └── index.ts
-│   ├── hooks
-│   │   └── index.ts
-│   ├── services
-│   ├── types
-│   │   ├── type.d.ts
-│   │   └── user.d.ts
-│   └── utils
-│       └── index.ts
-└── tsconfig.json
+│   ├── (auth)/login.tsx
+│   ├── (auth)/register.tsx
+│   ├── (tabs)/index.tsx
+│   ├── pets-details/[id].tsx
+│   └── register-pet/index.tsx
+├── pages/
+│   ├── home/           Home.tsx + _components/ + _hooks/
+│   ├── login/          Login.tsx + _components/ + _hooks/ + schema/
+│   ├── pets/           PetsDetails.tsx + RegisterPet.tsx + _components/ + _hooks/ + schema/
+│   └── register/       Register.tsx + _components/ + _hooks/ + schema/
+├── services/
+│   ├── api.ts          axios instance
+│   └── modules/
+│       ├── agendamento/  api.ts + queries.ts
+│       ├── auth/         api.ts + queries.ts + storage.ts
+│       ├── pets/         api.ts + queries.ts
+│       └── user/         api.ts + queries.ts
+└── shared/
+    ├── components/ui/
+    ├── hooks/          index.ts + auth-context.tsx
+    ├── types/          agendamento.d.ts + auth.d.ts + pet.d.ts + type.d.ts + user.d.ts
+    └── utils/
 ```
 
 ---
