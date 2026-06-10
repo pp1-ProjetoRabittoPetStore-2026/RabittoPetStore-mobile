@@ -2,7 +2,8 @@ import Home from '@/pages/home/Home';
 import { useLogout } from '@/services/modules/auth/queries';
 import { useAuth } from '@/shared/hooks';
 import { useQueryClient } from '@tanstack/react-query';
-import { LogOut } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { LogOut, User } from 'lucide-react-native';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -17,6 +18,7 @@ export default function Index() {
   const { mutate: logout, isPending } = useLogout();
   const queryClient = useQueryClient();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   function handleLogout() {
     logout(undefined, {
@@ -31,17 +33,25 @@ export default function Index() {
     <View style={styles.container}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.headerTitle}>Meus Pets</Text>
-        <TouchableOpacity
-          onPress={handleLogout}
-          disabled={isPending}
-          style={styles.logoutButton}
-        >
-          {isPending ? (
-            <ActivityIndicator size="small" color="#000" />
-          ) : (
-            <LogOut color="#000" size={22} />
-          )}
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            onPress={() => router.push('/profile' as never)}
+            style={styles.logoutButton}
+          >
+            <User color="#000" size={22} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleLogout}
+            disabled={isPending}
+            style={styles.logoutButton}
+          >
+            {isPending ? (
+              <ActivityIndicator size="small" color="#000" />
+            ) : (
+              <LogOut color="#000" size={22} />
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
       <Home />
     </View>
@@ -67,6 +77,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#0f172a',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   logoutButton: {
     padding: 6,

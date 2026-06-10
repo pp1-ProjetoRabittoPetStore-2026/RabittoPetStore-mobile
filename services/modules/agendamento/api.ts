@@ -20,8 +20,9 @@ export const getHorariosDisponiveis = async (
   return response.data;
 };
 
+// Agendamentos do tutor logado (resolvido pelo JWT no backend)
 export const getAgendamentos = async (): Promise<Agendamento[]> => {
-  const response = await api.get('/agendamentos/status');
+  const response = await api.get('/agendamentos/meus');
   return response.data;
 };
 

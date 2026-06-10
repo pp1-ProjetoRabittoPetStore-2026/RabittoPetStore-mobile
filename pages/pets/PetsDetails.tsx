@@ -37,6 +37,26 @@ import { petSchema, PetFormData } from './schema/pet.schema';
 
 type PetFormInput = z.input<typeof petSchema>;
 
+// Cor do badge de status (reflete a fila gerenciada no back-office)
+function statusColor(status: string): string {
+    switch (status) {
+        case 'Pendente':
+            return '#9CA3AF';
+        case 'Aguardando':
+            return '#F59E0B';
+        case 'Em Serviço':
+            return '#3B82F6';
+        case 'Pronto':
+        case 'Confirmado':
+            return '#22C55E';
+        case 'Rejeitado':
+        case 'Cancelado':
+            return '#EF4444';
+        default:
+            return '#9CA3AF';
+    }
+}
+
 export default function PetDetails() {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
@@ -255,6 +275,16 @@ export default function PetDetails() {
                                                 <Clock size={13} color="#AAA" />
                                                 <Text style={styles.agendamentoMetaText}>{timeStr}</Text>
                                             </View>
+                                            {a.status && (
+                                                <View
+                                                    style={[
+                                                        styles.statusBadge,
+                                                        { backgroundColor: statusColor(a.status) },
+                                                    ]}
+                                                >
+                                                    <Text style={styles.statusBadgeText}>{a.status}</Text>
+                                                </View>
+                                            )}
                                         </View>
                                         {a.servico.preco != null && (
                                             <Text style={styles.agendamentoPreco}>
@@ -405,4 +435,12 @@ const styles = StyleSheet.create({
     agendamentoMeta: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     agendamentoMetaText: { fontSize: 12, color: '#AAA' },
     agendamentoPreco: { fontSize: 14, fontWeight: '700', color: '#FF6B6B' },
+    statusBadge: {
+        alignSelf: 'flex-start',
+        marginTop: 6,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 8,
+    },
+    statusBadgeText: { fontSize: 11, fontWeight: '700', color: '#FFF' },
 });

@@ -14,6 +14,7 @@ export type AgendamentoPayload = {
 export type Agendamento = {
   id: number;
   dataHora: string;
+  status?: string;
   pet: { id: number };
   servico: Servico;
 };

@@ -9,6 +9,24 @@ export function useTutores() {
   });
 }
 
+export function useMyProfile() {
+  return useQuery({
+    queryKey: ['my-profile'],
+    queryFn: tutorApi.getMyProfile,
+  });
+}
+
+export function useUpdateMyProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (tutor: Tutor) => tutorApi.updateMyProfile(tutor),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-profile'] });
+    },
+  });
+}
+
 export function useCreateTutor() {
   const queryClient = useQueryClient();
 
