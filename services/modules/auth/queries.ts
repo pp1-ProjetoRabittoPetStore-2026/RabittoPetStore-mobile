@@ -28,7 +28,7 @@ export function useRefreshToken() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: authApi.refreshToken,
+    mutationFn: (token: string) => authApi.refreshToken(token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },

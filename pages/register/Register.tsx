@@ -1,4 +1,5 @@
 import { useCreateTutor } from '@/services/modules/user/queries';
+import { getApiErrorMessage, maskTelefone } from '@/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import {
@@ -31,6 +32,7 @@ export default function RegisterScreen() {
   const router = useRouter();
   const { mutate: register, isPending } = useCreateTutor();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     control,
@@ -40,15 +42,18 @@ export default function RegisterScreen() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = ({ confirmarSenha: _confirmarSenha, ...data }: RegisterFormData) => {
     register(data, {
       onSuccess: () => {
         Alert.alert('Conta criada!', 'Seu cadastro foi realizado com sucesso.', [
           { text: 'OK', onPress: () => router.back() },
         ]);
       },
-      onError: () => {
-        Alert.alert('Erro ao cadastrar', 'Não foi possível criar sua conta. Tente novamente.');
+      onError: (error) => {
+        Alert.alert(
+          'Erro ao cadastrar',
+          getApiErrorMessage(error, 'Não foi possível criar sua conta. Tente novamente.'),
+        );
       },
     });
   };
@@ -144,7 +149,7 @@ export default function RegisterScreen() {
                   style={styles.input}
                   placeholder="(00) 00000-0000"
                   onBlur={onBlur}
-                  onChangeText={onChange}
+                  onChangeText={(t) => onChange(maskTelefone(t))}
                   value={value}
                   keyboardType="phone-pad"
                 />
@@ -187,6 +192,45 @@ export default function RegisterScreen() {
           </View>
           {errors.senha && (
             <Text style={styles.errorText}>{errors.senha.message}</Text>
+          )}
+        </View>
+
+        {/* Campo Confirmar Senha */}
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Confirmar Senha</Text>
+          <View
+            style={[
+              styles.inputContainer,
+              errors.confirmarSenha && styles.inputError,
+            ]}
+          >
+            <Lock color="#666" size={20} style={styles.icon} />
+            <Controller
+              control={control}
+              name="confirmarSenha"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={styles.input}
+                  placeholder="Repita a senha"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry={!showConfirmPassword}
+                />
+              )}
+            />
+            <TouchableOpacity
+              onPress={() => setShowConfirmPassword((v) => !v)}
+            >
+              {showConfirmPassword ? (
+                <EyeOff color="#666" size={20} />
+              ) : (
+                <Eye color="#666" size={20} />
+              )}
+            </TouchableOpacity>
+          </View>
+          {errors.confirmarSenha && (
+            <Text style={styles.errorText}>{errors.confirmarSenha.message}</Text>
           )}
         </View>
 
