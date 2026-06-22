@@ -8,7 +8,7 @@ export type Servico = {
 export type AgendamentoPayload = {
   dataHora: string; // ISO 8601
   pet: { id: number };
-  servico: { id: number };
+  servicos: { id: number }[];
 };
 
 export type Agendamento = {
@@ -16,5 +16,5 @@ export type Agendamento = {
   dataHora: string;
   status?: string;
   pet: { id: number };
-  servico: Servico;
+  servicos: Servico[];
 };

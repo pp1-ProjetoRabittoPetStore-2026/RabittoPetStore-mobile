@@ -12,10 +12,10 @@ export const getServicos = async (): Promise<Servico[]> => {
 
 export const getHorariosDisponiveis = async (
   data: string,
-  servicoId: number,
+  servicoIds: number[],
 ): Promise<string[]> => {
   const response = await api.get('/agendamentos/horarios-disponiveis', {
-    params: { data, servicoId },
+    params: { data, servicoId: servicoIds },
   });
   return response.data;
 };

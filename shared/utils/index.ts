@@ -1,6 +1,7 @@
 import { isAxiosError } from 'axios';
 
 export * from './masks';
+export * from './datas';
 
 /**
  * Extrai a mensagem de erro padronizada do backend ({ error: string }).

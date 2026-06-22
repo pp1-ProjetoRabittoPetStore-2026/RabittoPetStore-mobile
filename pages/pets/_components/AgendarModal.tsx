@@ -10,7 +10,7 @@ import {
     Alert,
     TextInput,
 } from 'react-native';
-import { X, Calendar, Clock, Scissors } from 'lucide-react-native';
+import { X, Calendar, Clock, Scissors, Check } from 'lucide-react-native';
 
 import { useServicos, useHorariosDisponiveis, useCreateAgendamento } from '@/services/modules/agendamento/queries';
 import { Servico } from '@/shared/types/agendamento';
@@ -32,11 +32,12 @@ const isValidDate = (val: string) => /^\d{4}-\d{2}-\d{2}$/.test(val);
 export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalProps) {
     const router = useRouter();
     const [date, setDate] = useState(todayStr);
-    const [selectedServico, setSelectedServico] = useState<Servico | null>(null);
+    const [selectedServicos, setSelectedServicos] = useState<Servico[]>([]);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
     const { data: servicos, isLoading: loadingServicos } = useServicos();
 
+    const selectedIds = selectedServicos.map((s) => s.id);
 
     const {
         data: horariosDisponiveis,
@@ -44,14 +45,20 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
         isFetching: fetchingHorarios,
     } = useHorariosDisponiveis(
         isValidDate(date) ? date : '',
-        selectedServico?.id ?? null
+        selectedIds
     );
 
     const { mutate: criarAgendamento, isPending } = useCreateAgendamento();
 
-    // Reset selected time whenever service or date changes
-    const handleServicoSelect = (s: Servico) => {
-        setSelectedServico(s);
+    // Toggle service selection (multi-select)
+    const handleServicoToggle = (s: Servico) => {
+        setSelectedServicos((prev) => {
+            const exists = prev.some((sel) => sel.id === s.id);
+            if (exists) {
+                return prev.filter((sel) => sel.id !== s.id);
+            }
+            return [...prev, s];
+        });
         setSelectedTime(null);
     };
 
@@ -60,9 +67,11 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
         setSelectedTime(null);
     };
 
+    const totalPreco = selectedServicos.reduce((sum, s) => sum + (s.preco ?? 0), 0);
+
     const handleAgendar = () => {
-        if (!selectedServico) {
-            Alert.alert('Atenção', 'Selecione um serviço.');
+        if (selectedServicos.length === 0) {
+            Alert.alert('Atenção', 'Selecione ao menos um serviço.');
             return;
         }
         if (!isValidDate(date)) {
@@ -78,14 +87,16 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
             {
                 dataHora: `${date}T${selectedTime}:00`,
                 pet: { id: petId },
-                servico: { id: selectedServico.id },
+                servicos: selectedServicos.map((s) => ({ id: s.id })),
             },
             {
                 onSuccess: () => {
-                    Alert.alert('Sucesso! 🐾', `Agendamento de ${petNome} confirmado para ${date} às ${selectedTime}!`);
+                    const nomes = selectedServicos.map((s) => s.nome).join(', ');
+                    Alert.alert('Sucesso! 🐾', `Agendamento de ${petNome} confirmado para ${date} às ${selectedTime}!\nServiços: ${nomes}`);
                     setSelectedTime(null);
+                    setSelectedServicos([]);
                     onClose();
-                    router.push(`/pets-details/${petId}`)
+                    router.push(`/pets-details/${petId}`);
                 },
                 onError: (error: any) => {
                     const msg =
@@ -97,7 +108,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
         );
     };
 
-    const showTimePicker = isValidDate(date) && selectedServico != null;
+    const showTimePicker = isValidDate(date) && selectedServicos.length > 0;
     const loadingSlots = showTimePicker && (loadingHorarios || fetchingHorarios);
     const noSlotsAvailable =
         showTimePicker &&
@@ -112,7 +123,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                     {/* Header */}
                     <View style={styles.header}>
                         <View>
-                            <Text style={styles.title}>Agendar Serviço</Text>
+                            <Text style={styles.title}>Agendar Serviços</Text>
                             <Text style={styles.subtitle}>Pet: {petNome}</Text>
                         </View>
                         <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -122,45 +133,67 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
 
                     <ScrollView showsVerticalScrollIndicator={false}>
 
-                        {/* ── STEP 1: Serviço ── */}
-                        <SectionLabel text="1. Serviço" />
+                        {/* ── STEP 1: Serviços (multi-select) ── */}
+                        <SectionLabel text="1. Serviços (selecione um ou mais)" />
                         {loadingServicos ? (
                             <ActivityIndicator color="#FF6B6B" style={{ marginVertical: 16 }} />
                         ) : (
                             <View style={styles.servicosGrid}>
-                                {servicos?.map((s) => (
-                                    <TouchableOpacity
-                                        key={s.id}
-                                        style={[
-                                            styles.servicoCard,
-                                            selectedServico?.id === s.id && styles.servicoCardSelected,
-                                        ]}
-                                        onPress={() => handleServicoSelect(s)}
-                                    >
-                                        <Scissors
-                                            size={20}
-                                            color={selectedServico?.id === s.id ? '#FFF' : '#FF6B6B'}
-                                        />
-                                        <Text
+                                {servicos?.map((s) => {
+                                    const isSelected = selectedServicos.some((sel) => sel.id === s.id);
+                                    return (
+                                        <TouchableOpacity
+                                            key={s.id}
                                             style={[
-                                                styles.servicoNome,
-                                                selectedServico?.id === s.id && styles.textOnRed,
+                                                styles.servicoCard,
+                                                isSelected && styles.servicoCardSelected,
                                             ]}
+                                            onPress={() => handleServicoToggle(s)}
                                         >
-                                            {s.nome}
-                                        </Text>
-                                        {s.preco != null && (
+                                            {isSelected ? (
+                                                <Check size={20} color="#FFF" />
+                                            ) : (
+                                                <Scissors size={20} color="#FF6B6B" />
+                                            )}
                                             <Text
                                                 style={[
-                                                    styles.servicoPreco,
-                                                    selectedServico?.id === s.id && styles.servicoPrecoSelected,
+                                                    styles.servicoNome,
+                                                    isSelected && styles.textOnRed,
                                                 ]}
                                             >
-                                                R$ {s.preco.toFixed(2)}
+                                                {s.nome}
                                             </Text>
-                                        )}
-                                    </TouchableOpacity>
+                                            {s.preco != null && (
+                                                <Text
+                                                    style={[
+                                                        styles.servicoPreco,
+                                                        isSelected && styles.servicoPrecoSelected,
+                                                    ]}
+                                                >
+                                                    R$ {s.preco.toFixed(2)}
+                                                </Text>
+                                            )}
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        )}
+
+                        {/* ── Summary: selected services ── */}
+                        {selectedServicos.length > 0 && (
+                            <View style={styles.summaryBox}>
+                                <Text style={styles.summaryTitle}>
+                                    {selectedServicos.length} serviço{selectedServicos.length > 1 ? 's' : ''} selecionado{selectedServicos.length > 1 ? 's' : ''}
+                                </Text>
+                                {selectedServicos.map((s) => (
+                                    <Text key={s.id} style={styles.summaryItem}>
+                                        • {s.nome}{s.preco != null ? ` — R$ ${s.preco.toFixed(2)}` : ''}
+                                    </Text>
                                 ))}
+                                <View style={styles.summaryDivider} />
+                                <Text style={styles.summaryTotal}>
+                                    Total: R$ {totalPreco.toFixed(2)}
+                                </Text>
                             </View>
                         )}
 
@@ -182,11 +215,11 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                         {/* ── STEP 3: Horário disponível ── */}
                         <SectionLabel text="3. Horário Disponível" />
 
-                        {!selectedServico && (
-                            <Text style={styles.hint}>Selecione um serviço para ver os horários disponíveis.</Text>
+                        {selectedServicos.length === 0 && (
+                            <Text style={styles.hint}>Selecione ao menos um serviço para ver os horários disponíveis.</Text>
                         )}
 
-                        {!isValidDate(date) && selectedServico && (
+                        {!isValidDate(date) && selectedServicos.length > 0 && (
                             <Text style={styles.hint}>Insira uma data válida para ver os horários disponíveis.</Text>
                         )}
 
@@ -300,6 +333,37 @@ const styles = StyleSheet.create({
     servicoNome: { fontSize: 14, fontWeight: '600', color: '#333', textAlign: 'center' },
     servicoPreco: { fontSize: 13, color: '#888' },
     servicoPrecoSelected: { color: 'rgba(255,255,255,0.85)' },
+
+    // Summary box
+    summaryBox: {
+        backgroundColor: '#FFF5F5',
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: '#FFD4D4',
+        padding: 16,
+        marginTop: 16,
+    },
+    summaryTitle: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#FF6B6B',
+        marginBottom: 8,
+    },
+    summaryItem: {
+        fontSize: 13,
+        color: '#555',
+        lineHeight: 20,
+    },
+    summaryDivider: {
+        height: 1,
+        backgroundColor: '#FFD4D4',
+        marginVertical: 10,
+    },
+    summaryTotal: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: '#FF6B6B',
+    },
 
     // Date input
     inputRow: {

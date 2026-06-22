@@ -34,6 +34,7 @@ import { AgendarModal } from './_components/AgendarModal';
 import { useDeletePet, usePetById, useUpdatePet } from '@/services/modules/pets/queries';
 import { useAgendamentosByPet } from '@/services/modules/agendamento/queries';
 import { petSchema, PetFormData } from './schema/pet.schema';
+import { formatData, formatHora } from '@/shared/utils';
 
 type PetFormInput = z.input<typeof petSchema>;
 
@@ -255,20 +256,15 @@ export default function PetDetails() {
                             </View>
                         ) : (
                             agendamentos.map((a) => {
-                                const dt = new Date(a.dataHora);
-                                const dateStr = dt.toLocaleDateString('pt-BR', {
-                                    day: '2-digit', month: '2-digit', year: 'numeric',
-                                });
-                                const timeStr = dt.toLocaleTimeString('pt-BR', {
-                                    hour: '2-digit', minute: '2-digit',
-                                });
+                                const dateStr = formatData(a.dataHora);
+                                const timeStr = formatHora(a.dataHora);
                                 return (
                                     <View key={a.id} style={styles.agendamentoCard}>
                                         <View style={styles.agendamentoIconBox}>
                                             <Scissors size={18} color="#FF6B6B" />
                                         </View>
                                         <View style={styles.agendamentoInfo}>
-                                            <Text style={styles.agendamentoServico}>{a.servico.nome}</Text>
+                                            <Text style={styles.agendamentoServico}>{a.servicos.map((s) => s.nome).join(', ')}</Text>
                                             <View style={styles.agendamentoMeta}>
                                                 <Calendar size={13} color="#AAA" />
                                                 <Text style={styles.agendamentoMetaText}>{dateStr}</Text>
@@ -286,9 +282,9 @@ export default function PetDetails() {
                                                 </View>
                                             )}
                                         </View>
-                                        {a.servico.preco != null && (
+                                        {a.servicos.length > 0 && (
                                             <Text style={styles.agendamentoPreco}>
-                                                R$ {a.servico.preco.toFixed(2)}
+                                                R$ {a.servicos.reduce((sum, s) => sum + (s.preco ?? 0), 0).toFixed(2)}
                                             </Text>
                                         )}
                                     </View>
