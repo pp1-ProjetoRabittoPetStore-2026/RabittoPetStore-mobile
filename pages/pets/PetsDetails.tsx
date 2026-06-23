@@ -261,7 +261,7 @@ export default function PetDetails() {
           <>
             <View style={styles.scheduledHeader}>
               <ClipboardList size={20} color="#555" />
-              <Text style={styles.scheduledTitle}>Serviços Agendados</Text>
+              <Text style={styles.scheduledTitle}>Histórico</Text>
             </View>
 
             {loadingAgendamentos ? (

@@ -111,11 +111,12 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
 
     const showTimePicker = isValidDate(date) && selectedServicos.length > 0;
     const loadingSlots = showTimePicker && (loadingHorarios || fetchingHorarios);
+    const hasSlots = (horariosDisponiveis?.length ?? 0) > 0;
     const noSlotsAvailable =
         showTimePicker &&
         !loadingSlots &&
-        horariosDisponiveis != null &&
-        horariosDisponiveis.length === 0;
+        hasSlots &&
+        horariosDisponiveis!.every((slot) => !slot.disponivel);
 
     return (
         <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
@@ -237,27 +238,34 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                             </View>
                         )}
 
-                        {showTimePicker && !loadingSlots && (horariosDisponiveis?.length ?? 0) > 0 && (
+                        {showTimePicker && !loadingSlots && hasSlots && (
                             <View style={styles.slotsGrid}>
-                                {horariosDisponiveis!.map((slot) => (
-                                    <TouchableOpacity
-                                        key={slot}
-                                        style={[
-                                            styles.slotChip,
-                                            selectedTime === slot && styles.slotChipSelected,
-                                        ]}
-                                        onPress={() => setSelectedTime(slot)}
-                                    >
-                                        <Text
+                                {horariosDisponiveis!.map((slot) => {
+                                    const isSelected = selectedTime === slot.hora;
+                                    const isDisabled = !slot.disponivel;
+                                    return (
+                                        <TouchableOpacity
+                                            key={slot.hora}
                                             style={[
-                                                styles.slotText,
-                                                selectedTime === slot && styles.textOnRed,
+                                                styles.slotChip,
+                                                isSelected && styles.slotChipSelected,
+                                                isDisabled && styles.slotChipDisabled,
                                             ]}
+                                            onPress={() => setSelectedTime(slot.hora)}
+                                            disabled={isDisabled}
                                         >
-                                            {slot}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
+                                            <Text
+                                                style={[
+                                                    styles.slotText,
+                                                    isSelected && styles.textOnRed,
+                                                    isDisabled && styles.slotTextDisabled,
+                                                ]}
+                                            >
+                                                {slot.hora}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
                             </View>
                         )}
                     </ScrollView>
@@ -397,7 +405,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     slotChipSelected: { backgroundColor: '#FF6B6B', borderColor: '#FF6B6B' },
+    slotChipDisabled: { backgroundColor: '#F2F2F2', borderColor: '#EAEAEA', opacity: 0.55 },
     slotText: { fontSize: 15, fontWeight: '600', color: '#444' },
+    slotTextDisabled: { color: '#B5B5B5', textDecorationLine: 'line-through' },
 
     
 

@@ -23,9 +23,13 @@ export function useAgendamentosByPet(petId: number | undefined) {
     queryKey: ['agendamentos', petId],
     queryFn: async () => {
       const all = await getAgendamentos();
-      return all.filter((a) => a.pet.id === petId);
+      return all
+        .filter((a) => a.pet.id === petId)
+        .sort((a, b) => a.dataHora.localeCompare(b.dataHora));
     },
     enabled: petId != null,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 }
 

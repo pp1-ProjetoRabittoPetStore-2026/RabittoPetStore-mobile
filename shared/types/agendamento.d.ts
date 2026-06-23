@@ -1,3 +1,8 @@
+export type HorarioSlot = {
+  hora: string;
+  disponivel: boolean;
+};
+
 export type Servico = {
   id: number;
   nome: string;

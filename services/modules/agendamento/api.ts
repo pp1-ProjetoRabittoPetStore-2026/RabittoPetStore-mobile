@@ -2,6 +2,7 @@ import { api } from '@/services/api';
 import {
   Agendamento,
   AgendamentoPayload,
+  HorarioSlot,
   Servico,
 } from '@/shared/types/agendamento';
 
@@ -13,7 +14,7 @@ export const getServicos = async (): Promise<Servico[]> => {
 export const getHorariosDisponiveis = async (
   data: string,
   servicoIds: number[],
-): Promise<string[]> => {
+): Promise<HorarioSlot[]> => {
   const response = await api.get('/agendamentos/horarios-disponiveis', {
     params: { data, servicoId: servicoIds },
   });
