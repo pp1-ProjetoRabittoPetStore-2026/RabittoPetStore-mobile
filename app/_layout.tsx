@@ -7,8 +7,10 @@ import { ActivityIndicator, View } from 'react-native';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 2, // Tenta novamente 2 vezes em caso de erro
-      staleTime: 1000 * 60 * 5, // Considera os dados "frescos" por 5 minutos
+      retry: 2, 
+
+      staleTime: 1000 * 60 * 5, 
+
     },
   },
 });

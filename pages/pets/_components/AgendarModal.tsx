@@ -50,7 +50,8 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
 
     const { mutate: criarAgendamento, isPending } = useCreateAgendamento();
 
-    // Toggle service selection (multi-select)
+    
+
     const handleServicoToggle = (s: Servico) => {
         setSelectedServicos((prev) => {
             const exists = prev.some((sel) => sel.id === s.id);
@@ -120,7 +121,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
         <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
             <View style={styles.overlay}>
                 <View style={styles.sheet}>
-                    {/* Header */}
+                    {}
                     <View style={styles.header}>
                         <View>
                             <Text style={styles.title}>Agendar Serviços</Text>
@@ -133,7 +134,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
 
                     <ScrollView showsVerticalScrollIndicator={false}>
 
-                        {/* ── STEP 1: Serviços (multi-select) ── */}
+                        {}
                         <SectionLabel text="1. Serviços (selecione um ou mais)" />
                         {loadingServicos ? (
                             <ActivityIndicator color="#FF6B6B" style={{ marginVertical: 16 }} />
@@ -179,7 +180,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                             </View>
                         )}
 
-                        {/* ── Summary: selected services ── */}
+                        {}
                         {selectedServicos.length > 0 && (
                             <View style={styles.summaryBox}>
                                 <Text style={styles.summaryTitle}>
@@ -197,7 +198,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                             </View>
                         )}
 
-                        {/* ── STEP 2: Data ── */}
+                        {}
                         <SectionLabel text="2. Data (AAAA-MM-DD)" />
                         <View style={styles.inputRow}>
                             <Calendar size={20} color="#FF6B6B" />
@@ -212,7 +213,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                             />
                         </View>
 
-                        {/* ── STEP 3: Horário disponível ── */}
+                        {}
                         <SectionLabel text="3. Horário Disponível" />
 
                         {selectedServicos.length === 0 && (
@@ -261,7 +262,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                         )}
                     </ScrollView>
 
-                    {/* Confirm */}
+                    {}
                     <TouchableOpacity
                         style={[styles.confirmBtn, isPending && { opacity: 0.7 }]}
                         onPress={handleAgendar}
@@ -317,7 +318,8 @@ const styles = StyleSheet.create({
         marginTop: 22,
     },
 
-    // Serviços
+    
+
     servicosGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
     servicoCard: {
         width: '47%',
@@ -334,7 +336,8 @@ const styles = StyleSheet.create({
     servicoPreco: { fontSize: 13, color: '#888' },
     servicoPrecoSelected: { color: 'rgba(255,255,255,0.85)' },
 
-    // Summary box
+    
+
     summaryBox: {
         backgroundColor: '#FFF5F5',
         borderRadius: 14,
@@ -365,7 +368,8 @@ const styles = StyleSheet.create({
         color: '#FF6B6B',
     },
 
-    // Date input
+    
+
     inputRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -379,7 +383,8 @@ const styles = StyleSheet.create({
     },
     textInput: { flex: 1, height: 44, fontSize: 16, color: '#333' },
 
-    // Time slots
+    
+
     slotsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
     slotChip: {
         paddingHorizontal: 18,
@@ -394,13 +399,15 @@ const styles = StyleSheet.create({
     slotChipSelected: { backgroundColor: '#FF6B6B', borderColor: '#FF6B6B' },
     slotText: { fontSize: 15, fontWeight: '600', color: '#444' },
 
-    // Shared
+    
+
     textOnRed: { color: '#FFF' },
     hint: { fontSize: 13, color: '#AAAAAA', marginTop: 4, lineHeight: 18 },
     emptySlots: { alignItems: 'center', paddingVertical: 20, gap: 8 },
     emptySlotsText: { fontSize: 14, color: '#BBBBBB', textAlign: 'center', lineHeight: 20 },
 
-    // Footer button
+    
+
     confirmBtn: {
         backgroundColor: '#FF6B6B',
         height: 56,

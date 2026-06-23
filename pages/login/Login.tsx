@@ -50,7 +50,7 @@ export default function LoginScreen() {
         </View>
       )}
 
-      {/* Campo E-mail */}
+      {}
       <View style={styles.inputContainer}>
         <Mail color="#666" size={20} style={styles.icon} />
         <Controller
@@ -73,7 +73,7 @@ export default function LoginScreen() {
         <Text style={styles.errorText}>{errors.email.message}</Text>
       )}
 
-      {/* Campo Senha */}
+      {}
       <View style={styles.inputContainer}>
         <Lock color="#666" size={20} style={styles.icon} />
         <Controller

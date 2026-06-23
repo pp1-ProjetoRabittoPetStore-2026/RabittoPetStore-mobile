@@ -32,7 +32,8 @@ async function removeItem(key: string): Promise<void> {
   await SecureStore.deleteItemAsync(key);
 }
 
-// ----- Access token -----
+
+
 export function getStoredToken(): Promise<string | null> {
   return getItem(TOKEN_KEY);
 }
@@ -45,7 +46,8 @@ export function clearStoredToken(): Promise<void> {
   return removeItem(TOKEN_KEY);
 }
 
-// ----- Refresh token -----
+
+
 export function getStoredRefreshToken(): Promise<string | null> {
   return getItem(REFRESH_KEY);
 }
@@ -58,7 +60,8 @@ export function clearStoredRefreshToken(): Promise<void> {
   return removeItem(REFRESH_KEY);
 }
 
-// Limpa toda a sessão (access + refresh) de uma vez.
+
+
 export async function clearSession(): Promise<void> {
   await Promise.all([clearStoredToken(), clearStoredRefreshToken()]);
 }

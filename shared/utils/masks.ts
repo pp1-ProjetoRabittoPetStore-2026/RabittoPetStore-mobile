@@ -1,9 +1,12 @@
 import { format, type Replacement } from '@react-input/mask';
 
-// @react-input/mask é DOM-only (useMask/InputMask). No React Native usamos a
-// função imperativa `format` dentro do onChangeText do TextInput.
 
-// Cada "_" aceita apenas um dígito.
+
+
+
+
+
+
 const DIGIT: Replacement = { _: /\d/ };
 
 type MaskConfig = { mask: string; replacement: Replacement };

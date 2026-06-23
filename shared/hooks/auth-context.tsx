@@ -70,8 +70,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await clearSession();
   }, []);
 
-  // Permite que o interceptor de refresh (services/api) force logout na UI
-  // quando a sessão se torna irrecuperável.
+  
+
+  
+
   useEffect(() => {
     setOnUnauthorized(() => setToken(null));
     return () => setOnUnauthorized(null);

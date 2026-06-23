@@ -6,7 +6,8 @@ export type Servico = {
 };
 
 export type AgendamentoPayload = {
-  dataHora: string; // ISO 8601
+  dataHora: string; 
+
   pet: { id: number };
   servicos: { id: number }[];
 };

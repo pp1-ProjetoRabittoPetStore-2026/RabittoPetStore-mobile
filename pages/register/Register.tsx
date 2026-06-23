@@ -64,7 +64,7 @@ export default function RegisterScreen() {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Botão Voltar */}
+        {}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
@@ -77,7 +77,7 @@ export default function RegisterScreen() {
           Cadastre-se para cuidar dos seus pets
         </Text>
 
-        {/* Campo Nome */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Nome</Text>
           <View
@@ -103,7 +103,7 @@ export default function RegisterScreen() {
           )}
         </View>
 
-        {/* Campo E-mail */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>E-mail</Text>
           <View
@@ -131,7 +131,7 @@ export default function RegisterScreen() {
           )}
         </View>
 
-        {/* Campo Telefone */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Telefone</Text>
           <View
@@ -161,7 +161,7 @@ export default function RegisterScreen() {
           )}
         </View>
 
-        {/* Campo Senha */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Senha</Text>
           <View
@@ -195,7 +195,7 @@ export default function RegisterScreen() {
           )}
         </View>
 
-        {/* Campo Confirmar Senha */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Confirmar Senha</Text>
           <View

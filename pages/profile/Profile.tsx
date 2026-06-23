@@ -46,7 +46,8 @@ export default function ProfileScreen() {
   }, [profile, reset]);
 
   const onSubmit = (data: ProfileFormData) => {
-    // Não envia senha vazia (mantém a atual)
+    
+
     const payload = { ...data };
     if (!payload.senha) {
       delete payload.senha;

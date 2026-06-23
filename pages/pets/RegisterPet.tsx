@@ -56,7 +56,7 @@ export default function RegisterPet() {
         <Text style={styles.title}>Novo Pet 🐾</Text>
         <Text style={styles.subtitle}>Cadastre os dados do seu amiguinho</Text>
 
-        {/* Nome */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Nome do Pet</Text>
           <View style={styles.inputContainer}>
@@ -79,7 +79,7 @@ export default function RegisterPet() {
           )}
         </View>
 
-        {/* Espécie */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Espécie</Text>
           <View style={styles.inputContainer}>
@@ -102,7 +102,7 @@ export default function RegisterPet() {
           )}
         </View>
 
-        {/* Raça */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Raça</Text>
           <View style={styles.inputContainer}>
@@ -125,7 +125,7 @@ export default function RegisterPet() {
           )}
         </View>
 
-        {/* Porte */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Porte</Text>
           <View style={styles.inputContainer}>
@@ -148,7 +148,7 @@ export default function RegisterPet() {
           )}
         </View>
 
-        {/* Idade */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Idade (Anos)</Text>
           <View style={styles.inputContainer}>

@@ -16,7 +16,8 @@ export async function updateTutor(id: number, tutor: Tutor): Promise<Tutor> {
   return data;
 }
 
-// Perfil do próprio tutor logado (resolvido pelo JWT no backend)
+
+
 export async function getMyProfile(): Promise<Tutor> {
   const { data } = await api.get<Tutor>('/tutores/me');
   return data;

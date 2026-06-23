@@ -19,15 +19,18 @@ export const api = axios.create({
   },
 });
 
-// O AuthProvider registra aqui um callback para refletir o logout na UI
-// quando o refresh falhar (sessão irrecuperável).
+
+
+
+
 let onUnauthorized: (() => void) | null = null;
 
 export function setOnUnauthorized(handler: (() => void) | null) {
   onUnauthorized = handler;
 }
 
-// Injeta o access token em cada requisição.
+
+
 api.interceptors.request.use(async (config) => {
   const token = await getStoredToken();
   if (token && config.headers) {
@@ -38,8 +41,10 @@ api.interceptors.request.use(async (config) => {
 
 type RetriableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
-// Single-flight: garante uma única chamada /auth/refresh mesmo com várias
-// requisições recebendo 401 em paralelo.
+
+
+
+
 let refreshPromise: Promise<string> | null = null;
 
 async function refreshAccessToken(): Promise<string> {
@@ -48,7 +53,8 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error('Sem refresh token armazenado');
   }
 
-  // axios "cru" (sem interceptors) para não recursar no próprio refresh.
+  
+
   const { data } = await axios.post(`${baseURL}/auth/refresh`, {
     refreshToken,
   });
@@ -63,7 +69,8 @@ async function handleAuthFailure(): Promise<void> {
   onUnauthorized?.();
 }
 
-// Em 401: tenta renovar o token uma única vez e refaz a requisição original.
+
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -71,8 +78,10 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const url = original?.url ?? '';
 
-    // Só tenta refresh em 401, uma vez por requisição, e nunca para os
-    // próprios endpoints de auth (evita loop infinito).
+    
+
+    
+
     if (status !== 401 || !original || original._retry || url.includes('/auth/')) {
       return Promise.reject(error);
     }
