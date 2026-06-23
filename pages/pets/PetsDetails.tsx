@@ -66,6 +66,10 @@ export default function PetDetails() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isAgendarVisible, setIsAgendarVisible] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [servicoFilter, setServicoFilter] = useState<string | null>(null);
+  const [dataDe, setDataDe] = useState('');
+  const [dataAte, setDataAte] = useState('');
 
   const { data: pet, isLoading } = usePetById(id);
   const { mutate: updatePet, isPending: isUpdating } = useUpdatePet();
@@ -133,6 +137,47 @@ export default function PetDetails() {
         },
       },
     ]);
+  };
+
+  const statusList = Array.from(
+    new Set((agendamentos ?? []).map((a) => a?.status).filter(Boolean)),
+  ) as string[];
+  const servicoList = Array.from(
+    new Set(
+      (agendamentos ?? []).flatMap((a) => a?.servicos?.map((s) => s.nome) ?? []),
+    ),
+  );
+
+  const parseDia = (s: string): Date | null => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.trim());
+    if (!m) return null;
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  };
+
+  const filteredAgendamentos = (agendamentos ?? []).filter((a) => {
+    if (statusFilter && a?.status !== statusFilter) return false;
+    if (servicoFilter && !a?.servicos?.some((s) => s.nome === servicoFilter))
+      return false;
+    const d = a?.dataHora ? new Date(a.dataHora) : null;
+    const de = parseDia(dataDe);
+    const ate = parseDia(dataAte);
+    if (de && d && d < de) return false;
+    if (ate && d) {
+      const fim = new Date(ate);
+      fim.setHours(23, 59, 59, 999);
+      if (d > fim) return false;
+    }
+    return true;
+  });
+
+  const hasFilters =
+    !!statusFilter || !!servicoFilter || !!dataDe || !!dataAte;
+
+  const clearFilters = () => {
+    setStatusFilter(null);
+    setServicoFilter(null);
+    setDataDe('');
+    setDataAte('');
   };
 
   if (isLoading) {
@@ -262,22 +307,88 @@ export default function PetDetails() {
             <View style={styles.scheduledHeader}>
               <ClipboardList size={20} color="#555" />
               <Text style={styles.scheduledTitle}>Histórico</Text>
+              {hasFilters && (
+                <TouchableOpacity onPress={clearFilters} style={styles.clearBtn}>
+                  <Text style={styles.clearBtnText}>Limpar</Text>
+                </TouchableOpacity>
+              )}
             </View>
+
+            {agendamentos && agendamentos.length > 0 && (
+              <View style={styles.filters}>
+                {statusList.length > 0 && (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chipRow}
+                  >
+                    {statusList.map((st) => (
+                      <Chip
+                        key={st}
+                        label={st}
+                        active={statusFilter === st}
+                        onPress={() =>
+                          setStatusFilter(statusFilter === st ? null : st)
+                        }
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+                {servicoList.length > 0 && (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.chipRow}
+                  >
+                    {servicoList.map((sv) => (
+                      <Chip
+                        key={sv}
+                        label={sv}
+                        active={servicoFilter === sv}
+                        onPress={() =>
+                          setServicoFilter(servicoFilter === sv ? null : sv)
+                        }
+                      />
+                    ))}
+                  </ScrollView>
+                )}
+                <View style={styles.dateRow}>
+                  <TextInput
+                    style={styles.dateInput}
+                    placeholder="De (AAAA-MM-DD)"
+                    placeholderTextColor="#BBB"
+                    value={dataDe}
+                    onChangeText={setDataDe}
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={styles.dateInput}
+                    placeholder="Até (AAAA-MM-DD)"
+                    placeholderTextColor="#BBB"
+                    value={dataAte}
+                    onChangeText={setDataAte}
+                    autoCapitalize="none"
+                  />
+                </View>
+              </View>
+            )}
 
             {loadingAgendamentos ? (
               <ActivityIndicator
                 color="#FF6B6B"
                 style={{ marginVertical: 12 }}
               />
-            ) : !agendamentos || agendamentos.length === 0 ? (
+            ) : filteredAgendamentos.length === 0 ? (
               <View style={styles.emptyScheduled}>
                 <Calendar size={30} color="#DDD" />
                 <Text style={styles.emptyScheduledText}>
-                  Nenhum agendamento encontrado.
+                  {hasFilters
+                    ? 'Nenhum registro para os filtros aplicados.'
+                    : 'Nenhum agendamento encontrado.'}
                 </Text>
               </View>
             ) : (
-              agendamentos.map((a) => {
+              filteredAgendamentos.map((a) => {
                 const dateStr = formatData(a?.dataHora);
                 const timeStr = formatHora(a?.dataHora);
                 return (
@@ -373,6 +484,27 @@ function Field({
   );
 }
 
+function Chip({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.chip, active && styles.chipActive]}
+    >
+      <Text style={[styles.chipText, active && styles.chipTextActive]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { padding: 25, backgroundColor: '#FDFDFD', flexGrow: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -451,6 +583,39 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   scheduledTitle: { fontSize: 17, fontWeight: '700', color: '#333' },
+  clearBtn: {
+    marginLeft: 'auto',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: '#F0F0F0',
+  },
+  clearBtnText: { fontSize: 12, color: '#777', fontWeight: '600' },
+  filters: { gap: 10, marginBottom: 14 },
+  chipRow: { gap: 8, paddingRight: 8 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#EEE',
+    backgroundColor: '#FAFAFA',
+  },
+  chipActive: { backgroundColor: '#FF6B6B', borderColor: '#FF6B6B' },
+  chipText: { fontSize: 12, color: '#666', fontWeight: '600' },
+  chipTextActive: { color: '#FFF' },
+  dateRow: { flexDirection: 'row', gap: 10 },
+  dateInput: {
+    flex: 1,
+    height: 42,
+    borderWidth: 1,
+    borderColor: '#EEE',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    fontSize: 13,
+    backgroundColor: '#F9F9F9',
+    color: '#444',
+  },
   emptyScheduled: {
     alignItems: 'center',
     paddingVertical: 24,
