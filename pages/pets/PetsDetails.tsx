@@ -10,6 +10,7 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
+    RefreshControl,
 } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,10 +65,21 @@ export default function PetDetails() {
     const [isAgendarVisible, setIsAgendarVisible] = useState(false);
 
     // Queries e Mutations
-    const { data: pet, isLoading } = usePetById(id);
+    const { data: pet, isLoading, refetch: refetchPet, isRefetching: isRefetchingPet } = usePetById(id);
     const { mutate: updatePet, isPending: isUpdating } = useUpdatePet();
     const { mutate: deletePet } = useDeletePet();
-    const { data: agendamentos, isLoading: loadingAgendamentos } = useAgendamentosByPet(pet?.id);
+    const {
+        data: agendamentos,
+        isLoading: loadingAgendamentos,
+        refetch: refetchAgendamentos,
+        isRefetching: isRefetchingAgendamentos,
+    } = useAgendamentosByPet(pet?.id);
+
+    const isRefreshing = isRefetchingPet || isRefetchingAgendamentos;
+    const onRefresh = () => {
+        refetchPet();
+        refetchAgendamentos();
+    };
 
     const {
         control,
@@ -138,7 +150,17 @@ export default function PetDetails() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1 }}
         >
-            <ScrollView contentContainerStyle={styles.container}>
+            <ScrollView
+                contentContainerStyle={styles.container}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefreshing}
+                        onRefresh={onRefresh}
+                        colors={['#FF6B6B']}
+                        tintColor="#FF6B6B"
+                    />
+                }
+            >
                 {/* Header de Ações */}
                 <View style={styles.header}>
                     <Text style={styles.title}>{isEditing ? 'Editar Pet' : pet?.nome}</Text>
