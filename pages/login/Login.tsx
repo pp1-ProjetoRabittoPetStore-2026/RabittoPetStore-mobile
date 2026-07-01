@@ -8,6 +8,7 @@ import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import {
   ActivityIndicator,
+  Image,
   StyleSheet,
   Text,
   TextInput,
@@ -15,6 +16,8 @@ import {
   View,
 } from 'react-native';
 import { LoginFormData, loginSchema } from './schema/login.schema';
+
+const rabittoLogo = require('@/assets/images/rabitto-logo.png');
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -40,6 +43,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <Image source={rabittoLogo} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Bem-vindo ao Rabitto</Text>
 
       {error && (
@@ -129,6 +133,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#F8F9FA',
+  },
+  logo: {
+    width: '100%',
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 10,
   },
   title: {
     fontSize: 26,
