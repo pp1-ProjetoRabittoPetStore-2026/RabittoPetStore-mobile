@@ -422,6 +422,10 @@ export default function PetDetails() {
               filteredAgendamentos.map((a) => {
                 const dateStr = formatData(a?.dataHora);
                 const timeStr = formatHora(a?.dataHora);
+                const totalDuracao = a?.servicos?.reduce(
+                  (sum, s) => sum + (s.duracaoMinutos ?? 0),
+                  0,
+                );
                 return (
                   <View key={a?.id} style={styles.agendamentoCard}>
                     <View style={styles.agendamentoIconBox}>
@@ -439,6 +443,7 @@ export default function PetDetails() {
                         <Clock size={13} color="#AAA" />
                         <Text style={styles.agendamentoMetaText}>
                           {timeStr}
+                          {totalDuracao > 0 ? ` (${totalDuracao} min)` : ''}
                         </Text>
                       </View>
                       {a?.status && (

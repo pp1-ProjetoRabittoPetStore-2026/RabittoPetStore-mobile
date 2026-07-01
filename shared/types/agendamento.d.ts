@@ -8,6 +8,7 @@ export type Servico = {
   nome: string;
   descricao?: string;
   preco?: number;
+  duracaoMinutos?: number;
 };
 
 export type AgendamentoPayload = {

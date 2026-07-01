@@ -30,6 +30,26 @@ const toDateStr = (d: Date) => `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d
 const todayStr = toDateStr(today);
 
 const isValidDate = (val: string) => /^\d{2}-\d{2}-\d{4}$/.test(val);
+const toIsoDateStr = (val: string) => {
+    const [dd, mm, yyyy] = val.split('-');
+    return `${yyyy}-${mm}-${dd}`;
+};
+
+const formatDuracao = (minutos: number) => {
+    const h = Math.floor(minutos / 60);
+    const m = minutos % 60;
+    if (h === 0) return `${m}min`;
+    if (m === 0) return `${h}h`;
+    return `${h}h${String(m).padStart(2, '0')}`;
+};
+
+const addMinutes = (hhmm: string, minutos: number) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    const total = h * 60 + m + minutos;
+    const hh = Math.floor(total / 60) % 24;
+    const mm = total % 60;
+    return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+};
 
 export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalProps) {
     const router = useRouter();
@@ -48,7 +68,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
         isLoading: loadingHorarios,
         isFetching: fetchingHorarios,
     } = useHorariosDisponiveis(
-        isValidDate(date) ? date : '',
+        isValidDate(date) ? toIsoDateStr(date) : '',
         selectedIds
     );
 
@@ -76,6 +96,8 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
     };
 
     const totalPreco = selectedServicos.reduce((sum, s) => sum + (s.preco ?? 0), 0);
+    const totalDuracao = selectedServicos.reduce((sum, s) => sum + (s.duracaoMinutos ?? 0), 0);
+    const horaFim = selectedTime && totalDuracao > 0 ? addMinutes(selectedTime, totalDuracao) : null;
 
     const handleAgendar = () => {
         if (selectedServicos.length === 0) {
@@ -101,7 +123,8 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
             {
                 onSuccess: () => {
                     const nomes = selectedServicos.map((s) => s.nome).join(', ');
-                    Alert.alert('Sucesso! 🐾', `Agendamento de ${petNome} confirmado para ${date} às ${selectedTime}!\nServiços: ${nomes}`);
+                    const termino = horaFim ? ` (término estimado ${horaFim})` : '';
+                    Alert.alert('Sucesso! 🐾', `Agendamento de ${petNome} confirmado para ${date} às ${selectedTime}${termino}!\nServiços: ${nomes}`);
                     setSelectedTime(null);
                     setSelectedServicos([]);
                     onClose();
@@ -204,6 +227,11 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                                 <Text style={styles.summaryTotal}>
                                     Total: R$ {totalPreco.toFixed(2)}
                                 </Text>
+                                {totalDuracao > 0 && (
+                                    <Text style={styles.summaryDuracao}>
+                                        Duração estimada: {formatDuracao(totalDuracao)}
+                                    </Text>
+                                )}
                             </View>
                         )}
 
@@ -289,6 +317,10 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                                     );
                                 })}
                             </View>
+                        )}
+
+                        {selectedTime && horaFim && (
+                            <Text style={styles.hint}>Término estimado: {horaFim}</Text>
                         )}
                     </ScrollView>
 
@@ -396,6 +428,11 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '700',
         color: '#FF6B6B',
+    },
+    summaryDuracao: {
+        fontSize: 12,
+        color: '#999',
+        marginTop: 4,
     },
 
     
