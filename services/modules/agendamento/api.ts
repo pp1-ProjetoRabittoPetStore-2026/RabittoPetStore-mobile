@@ -34,3 +34,8 @@ export const createAgendamento = async (
   const response = await api.post('/agendamentos', payload);
   return response.data;
 };
+
+export const cancelarAgendamento = async (id: number): Promise<Agendamento> => {
+  const response = await api.patch(`/agendamentos/${id}/cancelar`);
+  return response.data;
+};

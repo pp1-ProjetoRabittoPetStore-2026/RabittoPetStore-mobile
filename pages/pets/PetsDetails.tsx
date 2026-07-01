@@ -29,6 +29,7 @@ import {
   ClipboardList,
   Scissors,
   Clock,
+  XCircle,
 } from 'lucide-react-native';
 import { AgendarModal } from './_components/AgendarModal';
 
@@ -37,11 +38,24 @@ import {
   usePetById,
   useUpdatePet,
 } from '@/services/modules/pets/queries';
-import { useAgendamentosByPet } from '@/services/modules/agendamento/queries';
+import {
+  useAgendamentosByPet,
+  useCancelarAgendamento,
+} from '@/services/modules/agendamento/queries';
 import { petSchema, PetFormData } from './schema/pet.schema';
 import { formatData, formatHora } from '@/shared/utils';
 
 type PetFormInput = z.input<typeof petSchema>;
+
+const UM_DIA_MS = 24 * 60 * 60 * 1000;
+const STATUS_NAO_CANCELAVEIS = ['Cancelado', 'Rejeitado'];
+
+function podeCancelar(status?: string, dataHora?: string): boolean {
+  if (!dataHora || (status && STATUS_NAO_CANCELAVEIS.includes(status))) {
+    return false;
+  }
+  return new Date(dataHora).getTime() - Date.now() >= UM_DIA_MS;
+}
 
 function statusColor(status: string): string {
   switch (status) {
@@ -81,6 +95,8 @@ export default function PetDetails() {
   } = usePetById(id);
   const { mutate: updatePet, isPending: isUpdating } = useUpdatePet();
   const { mutate: deletePet } = useDeletePet();
+  const { mutate: cancelarAgendamento, isPending: isCancelling } =
+    useCancelarAgendamento();
   const {
     data: agendamentos,
     isLoading: loadingAgendamentos,
@@ -154,6 +170,31 @@ export default function PetDetails() {
         },
       },
     ]);
+  };
+
+  const handleCancelarAgendamento = (agendamentoId: number) => {
+    Alert.alert(
+      'Cancelar Agendamento',
+      'Tem certeza que deseja cancelar este agendamento?',
+      [
+        { text: 'Voltar', style: 'cancel' },
+        {
+          text: 'Cancelar Agendamento',
+          style: 'destructive',
+          onPress: () => {
+            cancelarAgendamento(agendamentoId, {
+              onError: (error: any) => {
+                const msg =
+                  typeof error?.response?.data === 'string'
+                    ? error.response.data
+                    : 'Não foi possível cancelar o agendamento. Tente novamente.';
+                Alert.alert('Erro', msg);
+              },
+            });
+          },
+        },
+      ],
+    );
   };
 
   const statusList = Array.from(
@@ -426,6 +467,7 @@ export default function PetDetails() {
                   (sum, s) => sum + (s.duracaoMinutos ?? 0),
                   0,
                 );
+                const cancelavel = podeCancelar(a?.status, a?.dataHora);
                 return (
                   <View key={a?.id} style={styles.agendamentoCard}>
                     <View style={styles.agendamentoIconBox}>
@@ -466,6 +508,15 @@ export default function PetDetails() {
                           .reduce((sum, s) => sum + (s.preco ?? 0), 0)
                           .toFixed(2)}
                       </Text>
+                    )}
+                    {cancelavel && (
+                      <TouchableOpacity
+                        onPress={() => handleCancelarAgendamento(a!.id)}
+                        disabled={isCancelling}
+                        style={styles.cancelAgendamentoBtn}
+                      >
+                        <XCircle size={20} color="#E74C3C" />
+                      </TouchableOpacity>
                     )}
                   </View>
                 );
@@ -689,6 +740,7 @@ const styles = StyleSheet.create({
   agendamentoMeta: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   agendamentoMetaText: { fontSize: 12, color: '#AAA' },
   agendamentoPreco: { fontSize: 14, fontWeight: '700', color: '#FF6B6B' },
+  cancelAgendamentoBtn: { padding: 6, marginLeft: 4 },
   statusBadge: {
     alignSelf: 'flex-start',
     marginTop: 6,

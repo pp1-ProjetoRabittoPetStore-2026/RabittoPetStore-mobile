@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AgendamentoPayload } from '@/shared/types/agendamento';
-import { createAgendamento, getAgendamentos, getHorariosDisponiveis, getServicos } from './api';
+import { cancelarAgendamento, createAgendamento, getAgendamentos, getHorariosDisponiveis, getServicos } from './api';
 
 
 export function useServicos() {
@@ -38,6 +38,17 @@ export function useCreateAgendamento() {
 
   return useMutation({
     mutationFn: (payload: AgendamentoPayload) => createAgendamento(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['agendamentos'] });
+    },
+  });
+}
+
+export function useCancelarAgendamento() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => cancelarAgendamento(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['agendamentos'] });
     },
