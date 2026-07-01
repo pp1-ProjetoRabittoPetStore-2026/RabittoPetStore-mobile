@@ -1,6 +1,8 @@
+import { setOnUnauthorized } from '@/services/api';
 import {
-  clearStoredToken,
+  clearSession,
   getStoredToken,
+  setStoredRefreshToken,
   setStoredToken,
 } from '@/services/modules/auth/storage';
 import React, {
@@ -17,7 +19,7 @@ type AuthContextValue = {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  signIn: (token: string) => Promise<void>;
+  signIn: (token: string, refreshToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -52,14 +54,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, []);
 
-  const signIn = useCallback(async (newToken: string) => {
-    setToken(newToken);
-    await setStoredToken(newToken);
-  }, []);
+  const signIn = useCallback(
+    async (newToken: string, refreshToken?: string) => {
+      setToken(newToken);
+      await setStoredToken(newToken);
+      if (refreshToken) {
+        await setStoredRefreshToken(refreshToken);
+      }
+    },
+    [],
+  );
 
   const signOut = useCallback(async () => {
     setToken(null);
-    await clearStoredToken();
+    await clearSession();
+  }, []);
+
+  
+
+  
+
+  useEffect(() => {
+    setOnUnauthorized(() => setToken(null));
+    return () => setOnUnauthorized(null);
   }, []);
 
   const value = useMemo<AuthContextValue>(

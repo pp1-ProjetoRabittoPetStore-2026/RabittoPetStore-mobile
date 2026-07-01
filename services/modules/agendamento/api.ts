@@ -2,6 +2,7 @@ import { api } from '@/services/api';
 import {
   Agendamento,
   AgendamentoPayload,
+  HorarioSlot,
   Servico,
 } from '@/shared/types/agendamento';
 
@@ -12,15 +13,16 @@ export const getServicos = async (): Promise<Servico[]> => {
 
 export const getHorariosDisponiveis = async (
   data: string,
-  servicoId: number,
-): Promise<string[]> => {
+  servicoIds: number[],
+): Promise<HorarioSlot[]> => {
   const response = await api.get('/agendamentos/horarios-disponiveis', {
-    params: { data, servicoId },
+    params: { data, servicoId: servicoIds },
   });
   return response.data;
 };
 
-// Agendamentos do tutor logado (resolvido pelo JWT no backend)
+
+
 export const getAgendamentos = async (): Promise<Agendamento[]> => {
   const response = await api.get('/agendamentos/meus');
   return response.data;

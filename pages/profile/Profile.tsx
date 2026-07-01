@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { maskTelefone } from '@/shared/utils';
 import { ProfileFormData, profileSchema } from './schema/profile.schema';
 
 export default function ProfileScreen() {
@@ -45,7 +46,8 @@ export default function ProfileScreen() {
   }, [profile, reset]);
 
   const onSubmit = (data: ProfileFormData) => {
-    // Não envia senha vazia (mantém a atual)
+    
+
     const payload = { ...data };
     if (!payload.senha) {
       delete payload.senha;
@@ -104,6 +106,7 @@ export default function ProfileScreen() {
           icon={<Phone color="#666" size={20} />}
           placeholder="(00) 00000-0000"
           keyboardType="phone-pad"
+          mask={maskTelefone}
         />
         <Field
           label="Nova senha (opcional)"
@@ -134,7 +137,7 @@ export default function ProfileScreen() {
   );
 }
 
-function Field({ label, name, control, error, icon, ...rest }: any) {
+function Field({ label, name, control, error, icon, mask, ...rest }: any) {
   return (
     <View style={styles.inputWrapper}>
       <Text style={styles.label}>{label}</Text>
@@ -147,7 +150,7 @@ function Field({ label, name, control, error, icon, ...rest }: any) {
             <TextInput
               style={styles.input}
               onBlur={onBlur}
-              onChangeText={onChange}
+              onChangeText={mask ? (t: string) => onChange(mask(t)) : onChange}
               value={value}
               {...rest}
             />

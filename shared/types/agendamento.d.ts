@@ -1,3 +1,8 @@
+export type HorarioSlot = {
+  hora: string;
+  disponivel: boolean;
+};
+
 export type Servico = {
   id: number;
   nome: string;
@@ -6,9 +11,10 @@ export type Servico = {
 };
 
 export type AgendamentoPayload = {
-  dataHora: string; // ISO 8601
+  dataHora: string; 
+
   pet: { id: number };
-  servico: { id: number };
+  servicos: { id: number }[];
 };
 
 export type Agendamento = {
@@ -16,5 +22,5 @@ export type Agendamento = {
   dataHora: string;
   status?: string;
   pet: { id: number };
-  servico: Servico;
+  servicos: Servico[];
 };

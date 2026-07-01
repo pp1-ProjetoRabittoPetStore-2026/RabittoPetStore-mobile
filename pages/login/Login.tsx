@@ -1,5 +1,6 @@
 import { useLogin } from '@/services/modules/auth/queries';
 import { useAuth } from '@/shared/hooks';
+import { getApiErrorMessage } from '@/shared/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff, Lock, LogIn, Mail } from 'lucide-react-native';
@@ -17,7 +18,7 @@ import { LoginFormData, loginSchema } from './schema/login.schema';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { mutate: login, isPending } = useLogin();
+  const { mutate: login, isPending, error } = useLogin();
   const { signIn } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -31,8 +32,8 @@ export default function LoginScreen() {
 
   const onSubmit = (data: LoginFormData) => {
     login(data, {
-      onSuccess: async ({ accessToken }) => {
-        await signIn(accessToken);
+      onSuccess: async ({ accessToken, refreshToken }) => {
+        await signIn(accessToken, refreshToken);
       },
     });
   };
@@ -41,7 +42,15 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao Rabitto</Text>
 
-      {/* Campo E-mail */}
+      {error && (
+        <View style={styles.serverErrorBox}>
+          <Text style={styles.serverErrorText}>
+            {getApiErrorMessage(error, 'Não foi possível entrar. Tente novamente.')}
+          </Text>
+        </View>
+      )}
+
+      {}
       <View style={styles.inputContainer}>
         <Mail color="#666" size={20} style={styles.icon} />
         <Controller
@@ -64,7 +73,7 @@ export default function LoginScreen() {
         <Text style={styles.errorText}>{errors.email.message}</Text>
       )}
 
-      {/* Campo Senha */}
+      {}
       <View style={styles.inputContainer}>
         <Lock color="#666" size={20} style={styles.icon} />
         <Controller
@@ -164,4 +173,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     marginLeft: 5,
   },
+  serverErrorBox: {
+    backgroundColor: '#FDECEA',
+    borderWidth: 1,
+    borderColor: '#F5C6CB',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 20,
+  },
+  serverErrorText: { color: '#C0392B', fontSize: 14 },
 });

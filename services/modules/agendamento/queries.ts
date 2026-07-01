@@ -10,11 +10,11 @@ export function useServicos() {
   });
 }
 
-export function useHorariosDisponiveis(data: string, servicoId: number | null) {
+export function useHorariosDisponiveis(data: string, servicoIds: number[]) {
   return useQuery({
-    queryKey: ['horarios-disponiveis', data, servicoId],
-    queryFn: () => getHorariosDisponiveis(data, servicoId!),
-    enabled: Boolean(data && servicoId),
+    queryKey: ['horarios-disponiveis', data, servicoIds],
+    queryFn: () => getHorariosDisponiveis(data, servicoIds),
+    enabled: Boolean(data && servicoIds.length > 0),
   });
 }
 
@@ -23,9 +23,13 @@ export function useAgendamentosByPet(petId: number | undefined) {
     queryKey: ['agendamentos', petId],
     queryFn: async () => {
       const all = await getAgendamentos();
-      return all.filter((a) => a.pet.id === petId);
+      return all
+        .filter((a) => a.pet.id === petId)
+        .sort((a, b) => a.dataHora.localeCompare(b.dataHora));
     },
     enabled: petId != null,
+    staleTime: 0,
+    refetchOnMount: 'always',
   });
 }
 
@@ -39,4 +43,3 @@ export function useCreateAgendamento() {
     },
   });
 }
-

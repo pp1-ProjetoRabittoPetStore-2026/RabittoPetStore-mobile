@@ -11,13 +11,15 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Dog, Cat, Calendar, Info, Save } from 'lucide-react-native';
+import { Dog, Cat, Calendar, Info, Save, PawPrint } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { PetFormData, petSchema } from './schema/pet.schema';
 import { useCreatePet } from '@/services/modules/pets/queries';
+import { useEspecies, usePortes } from '@/services/modules/especies/queries';
+import { Dropdown } from '@/shared/components/ui';
 
 type PetFormInput = z.input<typeof petSchema>;
 
@@ -25,14 +27,31 @@ export default function RegisterPet() {
   const router = useRouter();
   const { mutate: createPet, isPending } = useCreatePet();
 
+  const { data: especies = [], isLoading: loadingEspecies } = useEspecies();
+  const { data: portes = [], isLoading: loadingPortes } = usePortes();
+
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<PetFormInput, any, PetFormData>({
     resolver: zodResolver(petSchema),
     defaultValues: { nome: '', especie: '', raca: '', idade: '', porte: 'médio' },
   });
+
+  const especieSelecionada = useWatch({ control, name: 'especie' });
+
+  const especieOptions = especies.map((e) => ({
+    label: e.displayName,
+    value: e.displayName,
+  }));
+
+  const racaOptions = (
+    especies.find((e) => e.displayName === especieSelecionada)?.racas ?? []
+  ).map((r) => ({ label: r, value: r }));
+
+  const porteOptions = portes.map((p) => ({ label: p, value: p }));
 
   const onSubmit = (data: PetFormData) => {
     createPet(data, {
@@ -56,7 +75,7 @@ export default function RegisterPet() {
         <Text style={styles.title}>Novo Pet 🐾</Text>
         <Text style={styles.subtitle}>Cadastre os dados do seu amiguinho</Text>
 
-        {/* Nome */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Nome do Pet</Text>
           <View style={styles.inputContainer}>
@@ -79,76 +98,83 @@ export default function RegisterPet() {
           )}
         </View>
 
-        {/* Espécie */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Espécie</Text>
-          <View style={styles.inputContainer}>
-            <Cat color="#666" size={20} style={styles.icon} />
-            <Controller
-              control={control}
-              name="especie"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ex: Cachorro"
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-            />
-          </View>
+          <Controller
+            control={control}
+            name="especie"
+            render={({ field: { onChange, value } }) => (
+              <Dropdown
+                icon={<Cat color="#666" size={20} style={styles.icon} />}
+                options={especieOptions}
+                value={value}
+                placeholder={
+                  loadingEspecies ? 'Carregando...' : 'Selecione a espécie'
+                }
+                disabled={loadingEspecies}
+                onSelect={(v) => {
+                  onChange(v);
+                  // espécie mudou: limpa a raça previamente escolhida
+                  setValue('raca', '', { shouldValidate: false });
+                }}
+              />
+            )}
+          />
           {errors.especie && (
             <Text style={styles.errorText}>{errors.especie.message}</Text>
           )}
         </View>
 
-        {/* Raça */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Raça</Text>
-          <View style={styles.inputContainer}>
-            <Dog color="#666" size={20} style={styles.icon} />
-            <Controller
-              control={control}
-              name="raca"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ex: Golden Retriever"
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-            />
-          </View>
+          <Controller
+            control={control}
+            name="raca"
+            render={({ field: { onChange, value } }) => (
+              <Dropdown
+                icon={<Dog color="#666" size={20} style={styles.icon} />}
+                options={racaOptions}
+                value={value}
+                placeholder={
+                  especieSelecionada
+                    ? 'Selecione a raça'
+                    : 'Escolha a espécie primeiro'
+                }
+                disabled={!especieSelecionada}
+                onSelect={onChange}
+              />
+            )}
+          />
           {errors.raca && (
             <Text style={styles.errorText}>{errors.raca.message}</Text>
           )}
         </View>
 
-        {/* Porte */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Porte</Text>
-          <View style={styles.inputContainer}>
-            <Dog color="#666" size={20} style={styles.icon} />
-            <Controller
-              control={control}
-              name="porte"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Ex: pequeno, médio, grande"
-                  onChangeText={onChange}
-                  value={value}
-                />
-              )}
-            />
-          </View>
+          <Controller
+            control={control}
+            name="porte"
+            render={({ field: { onChange, value } }) => (
+              <Dropdown
+                icon={<PawPrint color="#666" size={20} style={styles.icon} />}
+                options={porteOptions}
+                value={value}
+                placeholder={loadingPortes ? 'Carregando...' : 'Selecione o porte'}
+                disabled={loadingPortes}
+                onSelect={onChange}
+              />
+            )}
+          />
           {errors.porte && (
             <Text style={styles.errorText}>{errors.porte.message}</Text>
           )}
         </View>
 
-        {/* Idade */}
+        {}
         <View style={styles.inputWrapper}>
           <Text style={styles.label}>Idade (Anos)</Text>
           <View style={styles.inputContainer}>
