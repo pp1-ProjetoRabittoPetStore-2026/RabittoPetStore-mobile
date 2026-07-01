@@ -25,9 +25,9 @@ interface AgendarModalProps {
 
 const today = new Date();
 const pad = (n: number) => String(n).padStart(2, '0');
-const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+const todayStr = `${pad(today.getDate())}-${pad(today.getMonth() + 1)}-${today.getFullYear()}`;
 
-const isValidDate = (val: string) => /^\d{4}-\d{2}-\d{2}$/.test(val);
+const isValidDate = (val: string) => /^\d{2}-\d{2}-\d{4}$/.test(val);
 
 export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalProps) {
     const router = useRouter();
@@ -76,7 +76,7 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
             return;
         }
         if (!isValidDate(date)) {
-            Alert.alert('Atenção', 'Data inválida. Use o formato AAAA-MM-DD.');
+            Alert.alert('Atenção', 'Data inválida. Use o formato DD-MM-AAAA.');
             return;
         }
         if (!selectedTime) {
@@ -84,9 +84,10 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
             return;
         }
 
+        const [dd, mm, yyyy] = date.split('-');
         criarAgendamento(
             {
-                dataHora: `${date}T${selectedTime}:00`,
+                dataHora: `${yyyy}-${mm}-${dd}T${selectedTime}:00`,
                 pet: { id: petId },
                 servicos: selectedServicos.map((s) => ({ id: s.id })),
             },
@@ -200,14 +201,14 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                         )}
 
                         {}
-                        <SectionLabel text="2. Data (AAAA-MM-DD)" />
+                        <SectionLabel text="2. Data (DD-MM-AAAA)" />
                         <View style={styles.inputRow}>
                             <Calendar size={20} color="#FF6B6B" />
                             <TextInput
                                 style={styles.textInput}
                                 value={date}
                                 onChangeText={handleDateChange}
-                                placeholder="2025-12-31"
+                                placeholder="31-12-2025"
                                 placeholderTextColor="#CCC"
                                 keyboardType="numeric"
                                 maxLength={10}
