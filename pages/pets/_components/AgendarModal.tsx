@@ -8,8 +8,9 @@ import {
     ScrollView,
     ActivityIndicator,
     Alert,
-    TextInput,
+    Platform,
 } from 'react-native';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { X, Calendar, Clock, Scissors, Check } from 'lucide-react-native';
 
 import { useServicos, useHorariosDisponiveis, useCreateAgendamento } from '@/services/modules/agendamento/queries';
@@ -25,13 +26,16 @@ interface AgendarModalProps {
 
 const today = new Date();
 const pad = (n: number) => String(n).padStart(2, '0');
-const todayStr = `${pad(today.getDate())}-${pad(today.getMonth() + 1)}-${today.getFullYear()}`;
+const toDateStr = (d: Date) => `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+const todayStr = toDateStr(today);
 
 const isValidDate = (val: string) => /^\d{2}-\d{2}-\d{4}$/.test(val);
 
 export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalProps) {
     const router = useRouter();
+    const [dateObj, setDateObj] = useState(today);
     const [date, setDate] = useState(todayStr);
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const [selectedServicos, setSelectedServicos] = useState<Servico[]>([]);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
@@ -63,8 +67,11 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
         setSelectedTime(null);
     };
 
-    const handleDateChange = (val: string) => {
-        setDate(val);
+    const handleDateChange = (event: DateTimePickerEvent, selected?: Date) => {
+        setShowDatePicker(Platform.OS === 'ios');
+        if (event.type === 'dismissed' || !selected) return;
+        setDateObj(selected);
+        setDate(toDateStr(selected));
         setSelectedTime(null);
     };
 
@@ -201,19 +208,33 @@ export function AgendarModal({ visible, onClose, petId, petNome }: AgendarModalP
                         )}
 
                         {}
-                        <SectionLabel text="2. Data (DD-MM-AAAA)" />
-                        <View style={styles.inputRow}>
+                        <SectionLabel text="2. Data" />
+                        <TouchableOpacity
+                            style={styles.inputRow}
+                            onPress={() => setShowDatePicker(true)}
+                            activeOpacity={0.7}
+                        >
                             <Calendar size={20} color="#FF6B6B" />
-                            <TextInput
-                                style={styles.textInput}
-                                value={date}
-                                onChangeText={handleDateChange}
-                                placeholder="31-12-2025"
-                                placeholderTextColor="#CCC"
-                                keyboardType="numeric"
-                                maxLength={10}
+                            <Text style={styles.dateText}>{date}</Text>
+                        </TouchableOpacity>
+
+                        {showDatePicker && (
+                            <DateTimePicker
+                                value={dateObj}
+                                mode="date"
+                                display={Platform.OS === 'ios' ? 'inline' : 'default'}
+                                minimumDate={today}
+                                onChange={handleDateChange}
                             />
-                        </View>
+                        )}
+                        {Platform.OS === 'ios' && showDatePicker && (
+                            <TouchableOpacity
+                                style={styles.doneBtn}
+                                onPress={() => setShowDatePicker(false)}
+                            >
+                                <Text style={styles.doneBtnText}>Confirmar Data</Text>
+                            </TouchableOpacity>
+                        )}
 
                         {}
                         <SectionLabel text="3. Horário Disponível" />
@@ -390,7 +411,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 18,
         paddingVertical: 6,
     },
-    textInput: { flex: 1, height: 44, fontSize: 16, color: '#333' },
+    dateText: { flex: 1, height: 44, fontSize: 16, color: '#333', lineHeight: 44 },
+    doneBtn: {
+        alignSelf: 'flex-end',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        marginTop: 8,
+    },
+    doneBtnText: { color: '#FF6B6B', fontWeight: '700', fontSize: 14 },
 
     
 
